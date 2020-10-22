@@ -9,28 +9,72 @@ app.listen(3000, () =>{
     console.log("El servidor esta inicializado en el puerto 3000");
 
 let gamer = {
-    nombre: '',
-    apellido: '',
-    score: ''
+        nombreJugadors: 3,
+        jugadors: [{
+                posicio: "1",
+                alies: "jperez",
+                nom: "Jose",
+                congnom: "Perez",
+                score: "1000"
+        },
+        {
+                posicio: "2",
+                alies: "jsanz",
+                nom: "Juan",
+                congnom: "Sanz",
+                score: "950"
+        },
+        {
+                posicio: "3",
+                alies: "mgutierrez",
+                nom: "Maria",
+                congnom: "Gutierrez",
+                score: "850"
+        },
+        {
+            posicio: "",
+            alies: "",
+            nom: "",
+            congnom: "",
+            score: ""
+        }
+        ]
 };
+
 let respuesta = {
     error: false,
     codigo: 200,
     mensaje: ''
 };
+////////////////////////////////////// GET //////////////////////////////////////
+
+app.get('/gamer', function (req, res){
+
+    res.send(gamer);
+})
+app.get('/gamer/:alies', function(req,res){
+    const {alies} = req.params;
+    var max = jugadors.lenght;
+    for(var x = 0; x < max ; x++){
+        if(jugadors[x].alies == req.params.alies){
+        res.send(jugadors[x]);
+        }
+}
+})
 
 ////////////////////////////////////// POST //////////////////////////////////////
 app.post('/gamer', function (req, res) {
 
     var nom = req.body.nombre || null;
-    var cognom = req.body.apellido || null;;
+    var cognom = req.body.apellido || null;
     var coins = req.body.score || null;
+    var pos = req.body.posicio || null;
     // Si falta algun parametro dara error.
-    if(nom == null|| cognom == null || coins == null) {
+    if(nom == null|| cognom == null || coins == null || pos == null) {
         respuesta = {
         error: true,
         codigo: 502,
-        mensaje: 'Camps obligatoris camp nom, cognom o score'
+        mensaje: 'Camps obligatoris camp nom, cognom, score y posicio'
         };
     } 
     else {
@@ -60,3 +104,6 @@ app.post('/gamer', function (req, res) {
     res.send(respuesta);
 });
 })
+
+
+////////////////////////
