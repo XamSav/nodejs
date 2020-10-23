@@ -13,21 +13,21 @@ let jugadors = [{
                 posicio: 1,
                 alies: "jperez",
                 nom: "Jose",
-                congnom: "Perez",
+                cognom: "Perez",
                 score: 1000
         },
         {
                 posicio: 2,
                 alies: "jsanz",
                 nom: "Juan",
-                congnom: "Sanz",
+                cognom: "Sanz",
                 score: 950
         },
         {
                 posicio: 3,
                 alies: "mgutierrez",
                 nom: "Maria",
-                congnom: "Gutierrez",
+                cognom: "Gutierrez",
                 score: 850
         }
         ];
@@ -78,9 +78,6 @@ app.get('/ranking', function(req,res){
     res.send(jugadors);
 
 })
-
-
-
 
 
 
@@ -178,10 +175,65 @@ app.post('/jugadors/:alias', function (req, res) {
 
 
 
-
-
 ////////////////////////////////////// PUT //////////////////////////////////////
 
-app.put('/jugadors/:alies', function(req,res){
-
+app.put('/jugadors/:alias', function(req,res){
+    var nombre = req.body.nom ;
+    var apellido = req.body.cognom;
+    var coins = req.body.score;
+    var alias = req.body.alias;
+    var x = 0, y = 0;
+    for(i = 0; i < jugadors.length; i++){
+        if(jugadors[i].alies == req.params.alias){
+            x = i;
+        }else{
+            y++;
+        }
+    }
+    if(y == jugadors.length){
+        respuesta = {
+            error: true,
+            codigo: 504,
+            mensaje: "El jugador no existe"
+        }
+    }
+    if(nombre == null && apellido == null && coins == null && alias == null){
+        respuesta = {
+            error: true,
+            codigo: 220,
+            mensaje: "Tienes que actualizar algun campo"
+        }
+    }
+    else{
+       // if(nombre == "nom" && apellido == "cognom" && coins == "score" && alias == "alies"){
+            if(nombre != null){
+                jugadors[x].nom = nombre;
+                }
+            if(apellido != null){
+                jugadors[x].cognom = apellido;
+            }
+            if(coins != null){
+                jugadors[x].score = coins;
+            }
+            if(alias != null){
+                jugadors[x].alies = alias;
+            }
+            jugadors.sort((a,b) => (a.score < b.score ? 1 : -1));
+            for(i = 0; i < jugadors.length; i++){
+                jugadors[i].posicio = i + 1;
+            }
+            respuesta = {
+                error: false,
+                codigo: 220,
+                mensaje: "Jugador actualizado con exito"
+            }
+       /* }else{
+            respuesta = {
+                error: true,
+                codigo: 221,
+                mensaje: "Has escrito una variable mal"
+           }
+        }*/
+    }
+    res.send(respuesta);
 });
