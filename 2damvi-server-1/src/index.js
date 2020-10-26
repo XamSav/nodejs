@@ -212,36 +212,38 @@ app.put('/jugadors/:alias', function(req,res){
                 mensaje: "El jugador no existe"
             }
         }
-        if(nombre == null && apellido == null && coins == null && alias == null){
-            respuesta = {
-                error: true,
-                codigo: 220,
-                mensaje: "Tienes que actualizar algun campo"
-            }
-        }
-        else
-        {
-                if(nombre != null){
-                    jugadors[x].nom = nombre;
-                }
-                if(apellido != null){
-                    jugadors[x].cognom = apellido;
-                }
-                if(coins != null){
-                    jugadors[x].score = coins;
-                }
-                if(alias != null){
-                    jugadors[x].alies = alias;
-                }
-                jugadors.sort((a,b) => (a.score < b.score ? 1 : -1));
-                for(i = 0; i < jugadors.length; i++){
-                    jugadors[i].posicio = i + 1;
-                }
+        else{
+            if(nombre == null && apellido == null && coins == null && alias == null){
                 respuesta = {
-                    error: false,
+                    error: true,
                     codigo: 220,
-                    mensaje: "Jugador actualizado con exito"
+                    mensaje: "Tienes que actualizar algun campo"
                 }
+            }
+            else
+            {
+                    if(nombre != null){
+                        jugadors[x].nom = nombre;
+                    }
+                    if(apellido != null){
+                        jugadors[x].cognom = apellido;
+                    }
+                    if(coins != null){
+                        jugadors[x].score = coins;
+                    }
+                    if(alias != null){
+                        jugadors[x].alies = alias;
+                    }
+                    jugadors.sort((a,b) => (a.score < b.score ? 1 : -1));
+                    for(i = 0; i < jugadors.length; i++){
+                        jugadors[i].posicio = i + 1;
+                    }
+                    respuesta = {
+                        error: false,
+                        codigo: 220,
+                        mensaje: "Jugador actualizado con exito"
+                    }
+            }
         }
     }
     res.send(respuesta);
