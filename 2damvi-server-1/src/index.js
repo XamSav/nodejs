@@ -1,62 +1,133 @@
 const express = require("express");
-const bodyParser = require('body-parser');
-const app = express();
+const bodyParser = require("body-parser");
+const app = express()
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.listen(3000, () =>{
-    console.log("El servidor esta inicializado en el puerto 3000");
+let code100 = { code: 100, error: false, message: '2-DAMVI Server Up' };
+let code200 = { code: 200, error: false, message: 'Player Exists' };
+let code201 = { code: 201, error: false, message: 'Player Correctly Created' };
+let code202 = { code: 201, error: false, message: 'Player Correctly Updated' };
+let codeError502 = { code: 503, error: true, message: 'The field: name, surname, score are mandatories (the score value has to be >0)' };
+let codeError503 = { code: 503, error: true, message: 'Error: Player Exists' };
+let codeError504 = { code: 504, error: true, message: 'Error: Player not found' };
 
-let gamer = {
-    nombre: '',
-    apellido: '',
-    score: ''
+var players = [
+    { position: "1", alias: "jperez", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z"},
+    { position: "2", alias: "jsanz", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z" },
+    { position: "3", alias: "mgutierrez", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z" }
+];
+
+function UpdateRanking() {
+    //Order the ranking
+    players.sort((a, b) => (a.score <= b.score) ? 1 : -1);
+
+    //Position Update
+    for (x = 0; x < players.length; x++) {
+        players[x].position = x + 1;
+    }
 };
-let respuesta = {
-    error: false,
-    codigo: 200,
-    mensaje: ''
-};
 
-////////////////////////////////////// POST //////////////////////////////////////
-app.post('/gamer', function (req, res) {
+app.get('/', function (req, res) {
+    //code funciona ok
+    res.send(code100);
+});
 
-    var nom = req.body.nombre || null;
-    var cognom = req.body.apellido || null;;
-    var coins = req.body.score || null;
-    // Si falta algun parametro dara error.
-    if(nom == null|| cognom == null || coins == null) {
-        respuesta = {
-        error: true,
-        codigo: 502,
-        mensaje: 'Camps obligatoris camp nom, cognom o score'
-        };
-    } 
-    else {
-        //Si alguno de los parametros es igual a alguno ya creado dara error
-        if(gamer.nombre == nom && gamer.apellido == cognom) {
-            respuesta = {
-            error: true,
-            codigo: 503,
-            mensaje: 'El jugador ya fue creado previamente'
-        };} 
-        else {
-            //En "Gamer" pondra los parametros que se dieron en Post de draw -> Json
-            gamer = {
-            nombre: nom,
-            apellido: cognom,
-            score: coins
-        };
-        // Dira que no hay error, dara el codigo 200, un mensaje de jugador creado y tambien ensenara "Gamer" que esta en las lineas de arriba.
-        respuesta = {
-            error: false,
-            codigo: 200,
-            mensaje: 'Jugador creado',
-            respuesta: gamer
-        };
+app.get('/ranking', function (req, res) {
+    let ranking = { namebreplayers: players.length, players: players };
+    res.send(ranking);
+});
+
+app.get('/players/:alias', function (req, res) {
+    //Player Search
+    var index = players.findIndex(j => j.alias === req.params.alias);
+
+    if (index >= 0) {
+        //Player exists
+        response = code200;
+        response.jugador = players[index];
+    } else {
+        //Player doesn't exists
+        response = codeError504;
+    }
+    res.send(response);
+});
+
+app.post('/players/:alias', function (req, res) {
+    var paramAlias = req.params.alias || '';
+    var paramName = req.body.name || '';
+    var paramSurname = req.body.surname || '';
+    var paramScore = req.body.score || '';
+
+    if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '') {
+        response = codeError502;
+    } else {
+        //Player Search
+        var index = players.findIndex(j => j.alias === paramAlias)
+
+        if (index != -1) {
+            //Player allready exists
+            response = codeError503;
+        } else {
+            //Add Player
+            players.push({ 
+                position: '', 
+                alias: paramAlias, 
+                name: paramName, 
+                surname: paramSurname, 
+                score: paramScore ,
+                created: new Date()
+            });
+            //Sort the ranking
+            UpdateRanking();
+            //Search Player Again
+            index = players.findIndex(j => j.alias === paramAlias);
+            //Response return
+            response = code201;
+            response.player = players[index];
         }
     }
-    res.send(respuesta);
+    res.send(response);
 });
-})
+
+app.put('/players/:alias', function (req, res) {
+    var paramalias = req.params.alias || '';
+    var paramname = req.body.name || '';
+    var paramsurname = req.body.surname || '';
+    var paramScore = req.body.score || '';
+
+    if (paramalias === '' || paramname === '' || paramsurname === '' || parseInt(paramScore) <= 0 || paramScore === '') {
+        response = codeError502; //Paràmetres incomplerts
+    } else {
+        //Player Search
+        var index = players.findIndex(j => j.alias === paramalias)
+
+        if (index != -1) {
+            //Update Player
+            players[index] = { 
+                position: '', 
+                alias: paramalias, 
+                name: paramname, 
+                surname: paramsurname, 
+                score: paramScore,
+                created:  players[index].created,
+                updated: new Date()
+            };
+            //Sort the ranking
+            UpdateRanking();
+            //Search Player Again
+            index = players.findIndex(j => j.alias === paramalias);
+            //Response return
+            response = code202;
+            response.jugador = players[index];
+        } else {
+            response = codeError504;
+        }
+    }
+    res.send(response);
+});
+
+app.listen(3000, () => {
+    console.log("El servidor está inicializado en el puerto 3000");
+});
