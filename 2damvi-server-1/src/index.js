@@ -75,7 +75,11 @@ app.get('/ranking', function(req,res){
     for(i = 0; i < jugadors.length; i++){
         jugadors[i].posicio = i + 1;
     }
-    res.send(jugadors);
+    respuesta = {
+        nombreJugadors: jugadors.length,
+        jugadores: jugadors 
+    };
+    res.send(respuesta);
 
 })
 
@@ -140,7 +144,7 @@ app.post('/jugadors/:alias', function (req, res) {
         respuesta = {
             error: true,
             codigo: 502,
-            mensaje: 'Camps obligatoris camp nom, cognom, score y posicio'
+            mensaje: 'El campo alias, nombre, apellido y score son requeridos'
         };
     } 
     else {
@@ -149,7 +153,7 @@ app.post('/jugadors/:alias', function (req, res) {
             respuesta = {
                 error: true,
                 codigo: 503,
-                mensaje: 'El jugador ya fue creado previamente'
+                mensaje: 'El jugador ya existe'
             };
         } 
         else {
