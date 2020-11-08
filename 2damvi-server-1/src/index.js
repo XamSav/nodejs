@@ -139,7 +139,7 @@ app.put('/players/:alias', function (req, res) {
             //Response return
             response = code202;
             response.jugador = players[index];
-            putPlayer();
+            
         } else {
             response = codeError504;
         }
@@ -182,7 +182,7 @@ var postPlayer = function (req, res, next) {
   };
   
   var putPlayer = function (req, res, next) {
-    Player.findByAliasAndUpdate(req.body._Alias, req.body, {new: true}, function (err, player) {
+    Player.findByAliasAndUpdate(req.body.alias, req.body, {new: true}, function (err, player) {
       if (err) {
         next(err);
       } else {

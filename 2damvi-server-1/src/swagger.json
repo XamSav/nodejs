@@ -8,6 +8,7 @@
   "paths": {
     "/": {
       "get": {
+        "tags": ["Show Players"],
         "summary": "Principal Screen",
         "description": "This is the principal screen",
         "parameters": [],
@@ -32,51 +33,16 @@
         }
       ],
       "get": {
+        "tags": ["Show Players"],
         "summary": "Show Players",
         "description": "Show all the players",
         "parameters": [
-          {
-            "name": "position",
-            "in": "query",
-            "description": "The position of the Player.",
-            "required": false,
-            "type": "integer"
-          },
           {
             "name": "alias",
             "in": "path",
             "description": "The Alias of the Player.",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "name",
-            "in": "query",
-            "description": "The name of the Player.",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "surname",
-            "in": "query",
-            "description": "The surname of the Player.",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "score",
-            "in": "query",
-            "description": "The Score of the Player.",
-            "required": false,
-            "type": "integer"
-          },
-          {
-            "name": "created",
-            "in": "query",
-            "description": "The date created of the Player.",
-            "required": false,
-            "type": "string",
-            "format": "date"
           }
         ],
         "responses": {
@@ -95,6 +61,7 @@
         }
       },
       "post": {
+        "tags": ["Edit Players"],
         "summary": "Create Players",
         "description": "Enter a new player",
         "parameters": [
@@ -138,39 +105,26 @@
         }
       },
       "put": {
-        "summary": "Update Players",
-        "description": "Update a player",
+        "tags": ["Edit Players"],
+        "summary": "Edit a Player",
+        "description": "Edit a player",
         "parameters": [
           {
-            "name": "alias",
-            "in": "path",
-            "description": "The new alias of the Player",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "name",
-            "in": "query",
-            "description": "The new name of the Player",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "surname",
-            "in": "query",
-            "description": "The new surname of the Player",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "score",
-            "in": "query",
-            "description": "The new score of the Player",
-            "required": false,
-            "type": "string"
+            "name": "Player",
+            "in": "body",
+            "description": "Player that we want to update",
+            "schema": {
+              "$ref": "#/definitions/Player"
+            }
           }
         ],
         "responses": {
+          "200": {
+            "description": "Player Correctly Updated",
+            "schema": {
+              "$ref": "#/definitions/Player"
+            }
+          },
           "202": {
             "description": "Player Correctly Updated",
             "schema": {
@@ -194,6 +148,7 @@
     },
     "/ranking": {
       "get": {
+        "tags": ["Show Players"],
         "summary": "Show Players",
         "description": "Show all the players",
         "parameters": [],
