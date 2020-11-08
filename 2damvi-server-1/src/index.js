@@ -1,9 +1,20 @@
+'use strict';
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express()
-
+const router = express.Router();
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+var mongoose = require('mongoose'),
+  Schema = mongoose.Schema;
+
+mongoose.connect('mongodb://localhost:27017/swagger-demo', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
 
 let code100 = { code: 100, error: false, message: '2-DAMVI Server Up' };
 let code200 = { code: 200, error: false, message: 'Player Exists' };
@@ -18,13 +29,18 @@ var players = [
     { position: "2", alias: "jsanz", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z" },
     { position: "3", alias: "mgutierrez", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z" }
 ];
+let response = {
+    error: false,
+    code: 200,
+    message: ''
+};
 
 function UpdateRanking() {
     //Order the ranking
     players.sort((a, b) => (a.score <= b.score) ? 1 : -1);
 
     //Position Update
-    for (x = 0; x < players.length; x++) {
+    for (var x = 0; x < players.length; x++) {
         players[x].position = x + 1;
     }
 };
@@ -38,7 +54,9 @@ app.get('/ranking', function (req, res) {
     let ranking = { namebreplayers: players.length, players: players };
     res.send(ranking);
 });
-
+app.get('/players', function (req, res){
+    res.send(players);
+});
 app.get('/players/:alias', function (req, res) {
     //Player Search
     var index = players.findIndex(j => j.alias === req.params.alias);
@@ -121,6 +139,7 @@ app.put('/players/:alias', function (req, res) {
             //Response return
             response = code202;
             response.jugador = players[index];
+            putPlayer();
         } else {
             response = codeError504;
         }
@@ -131,3 +150,98 @@ app.put('/players/:alias', function (req, res) {
 app.listen(3000, () => {
     console.log("El servidor está inicializado en el puerto 3000");
 });
+
+
+/////////////////////////////////
+
+var PlayerSchema = new Schema({
+    position: {type: Number},
+    alias: {type: String, required: true},
+    name: {type: String},
+    surname: {type: String},
+    score: {type: Number},
+    created: {type: String}
+  });
+  
+  mongoose.model('Player', PlayerSchema);
+  var Player = require('mongoose').model('Player');
+
+//////////////////////////////////
+
+
+var postPlayer = function (req, res, next) {
+    var player = new Player(req.body);
+  
+    player.save(function (err) {
+      if (err) {
+        next(err);
+      } else {
+        res.json(player);
+      }
+    });
+  };
+  
+  var putPlayer = function (req, res, next) {
+    Player.findByAliasAndUpdate(req.body._Alias, req.body, {new: true}, function (err, player) {
+      if (err) {
+        next(err);
+      } else {
+        res.json(player);
+      }
+    });
+  };
+  
+  var deletePlayer = function (req, res, next) {
+    req.player.remove(function (err) {
+      if (err) {
+        next(err);
+      } else {
+        res.json(req.player);
+      }
+    });
+  };
+  
+  var getAllPlayers = function (req, res, next) {
+    Player.find(function (err, players) {
+      if (err) {
+        next(err);
+      } else {
+        res.json(players);
+      }
+    });
+  };
+  
+  var getOnePlayer = function (req, res) {
+    res.json(req.player);
+  };
+  
+  var getByAliasPlayer = function (req, res, next, Alias) {
+    Player.findOne({_Alias: Alias}, function (err, player) {
+      if (err) {
+        next(err);
+      } else {
+        req.player = player;
+        next();
+      }
+    });
+  };
+
+/////////////////////////////////
+
+router.route('/players')
+.post(postPlayer)
+.get(getAllPlayers);
+
+router.route('/players/:alias')
+.get(getOnePlayer)
+.put(putPlayer)
+.delete(deletePlayer);
+
+router.param('alias', getByAliasPlayer);
+
+app.use('/api/v1', router);
+module.exports = app;
+
+  //////////////////////////////
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/v1', router);
