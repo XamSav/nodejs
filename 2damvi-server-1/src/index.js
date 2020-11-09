@@ -11,16 +11,7 @@ app.use(bodyParser.json());
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
-/*const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://SamuelNodeJs:<YPbhk6JyFSxkUYTB>@cluster0.lgws1.mongodb.net/<dbname>?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true });
-client.connect(err => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});*/
-
-mongoose.connect('mongodb+srv://SamuelNodeJs:<YPbhk6JyFSxkUYTB>@cluster0.lgws1.mongodb.net/<dbname>?retryWrites=true&w=majority"', {
+mongoose.connect('mongodb+srv://SamuelNodeJs:xu6lNRFtrn2SqBdc@cluster0.lgws1.mongodb.net/<dbname>?retryWrites=true&w=majority"', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
