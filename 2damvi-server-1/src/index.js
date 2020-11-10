@@ -10,8 +10,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
-
-mongoose.connect('mongodb+srv://SamuelNodeJs:xu6lNRFtrn2SqBdc@cluster0.lgws1.mongodb.net/<dbname>?retryWrites=true&w=majority"', {
+  //mongodb://localhost:27017/test
+mongoose.connect('mongodb+srv://SamuelNodeJs:xu6lNRFtrn2SqBdc@cluster0.lgws1.mongodb.net/<dbname>?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
