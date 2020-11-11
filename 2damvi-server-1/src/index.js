@@ -16,7 +16,7 @@ mongoose.connect('mongodb+srv://SamuelNodeJs:xu6lNRFtrn2SqBdc@cluster0.lgws1.mon
     useUnifiedTopology: true
   });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 apijs.listen(port, () => {
     console.log("El servidor está inicializado en el puerto "+ port);
