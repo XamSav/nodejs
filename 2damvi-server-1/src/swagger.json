@@ -22,6 +22,47 @@
         }
       }
     },
+    "/players":{
+      "get": {
+        "tags": ["Show Players"],
+        "summary": "Show Players",
+        "description": "Show all the players",
+        "parameters": [],
+        "responses": {
+          "400": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "position": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "alias": {
+                  "type": "string",
+                  "example": "samv",
+                  "description": "The username of the Player"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Samuel",
+                  "description": "Name of the Player"
+                },
+                "surname": {
+                  "type": "string",
+                  "example": "Viguera",
+                  "description": "Surname of the Player"
+                },
+                "score": {
+                  "type": "integer",
+                  "example": 3000
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/players/{alias}": {
       "parameters": [
         {
@@ -206,6 +247,11 @@
         "score": {
           "type": "integer"
         }
+      },
+      "example":{
+        "name": "Samuel",
+        "surname": "Viguera",
+        "score": 3
       }
     },
     "code100": {
