@@ -2,10 +2,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express()
 const router = express.Router();
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 var mongoose = require('mongoose'),
-  Schema = mongoose.Schema;
-
-
+Schema = mongoose.Schema;
 
 
 let code100 = { code: 100, error: false, message: '2-DAMVI Server Up' };
