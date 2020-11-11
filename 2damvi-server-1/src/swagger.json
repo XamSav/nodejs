@@ -76,7 +76,7 @@
       "get": {
         "tags": ["Show Players"],
         "summary": "Show Players",
-        "description": "Show all the players",
+        "description": "Show a specific player",
         "parameters": [
           {
             "name": "alias",
