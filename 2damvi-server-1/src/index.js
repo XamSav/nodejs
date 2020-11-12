@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
   //mongodb://localhost:27017/test
-mongoose.connect('mongodb+srv://SamuelNodeJs:xu6lNRFtrn2SqBdc@cluster0.lgws1.mongodb.net/<dbname>?retryWrites=true&w=majority', {
+mongoose.connect('mongodb://localhost:27017/swagger-demo', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
