@@ -2,19 +2,11 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express()
-//const router = express.Router();
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const apijs = require('./api');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-var mongoose = require('mongoose'),
-  Schema = mongoose.Schema;
-  //mongodb://localhost:27017/test
-mongoose.connect('mongodb://localhost:27017/swagger-demo', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
 
 const port = process.env.PORT || 3000;
 
@@ -26,4 +18,3 @@ apijs.listen(port, () => {
 
   //////////////////////////////
 apijs.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-//apijs.use('/api/v1', router);
