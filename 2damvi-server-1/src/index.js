@@ -2,7 +2,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express()
-const router = express.Router();
+//const router = express.Router();
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const apijs = require('./api');
@@ -26,4 +26,4 @@ apijs.listen(port, () => {
 
   //////////////////////////////
 apijs.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-apijs.use('/api/v1', router);
+//apijs.use('/api/v1', router);
