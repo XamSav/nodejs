@@ -14,12 +14,17 @@ let codeError502 = { code: 502, error: true, message: 'The field: name, surname,
 let codeError503 = { code: 503, error: true, message: 'Error: Player Exists' };
 let codeError504 = { code: 504, error: true, message: 'Error: Player not found' };
 //Mensajes de compras
-let codeBuy401 = { code: 401, error: false, message: 'Buy' };
-let codeErrorBuy402 = { code: 402, error: true, message: 'Error: Please Specific the alias or the num of billetes for buy'};
-let codeErrorBuy403 = { code: 403, error: true, message: 'Error: You no have coins'};
+let codeBuy401 = { code: 401, error: false, message: 'Purchase made' };
+let codeErrorBuy402 = { code: 402, error: true, message: 'Error: Please specify the alias or the number of billetes to buy'};
+let codeErrorBuy403 = { code: 403, error: true, message: "Error: You don't have enough points"};
+
+var CatalogoHabilidades = [
+    {nombre: "Bola de fuego", id: 1},
+    {nombre: "Flash", id: 2 }
+];
 
 var players = [
-    { position: "1", alias: "jperez", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidades: "Ninguna"},
+    { position: "1", alias: "jperez", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: false, habilidad2: false},
     { position: "2", alias: "jsanz", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidades: "Ninguna" },
     { position: "3", alias: "mgutierrez", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidades: "Ninguna" }
 ];
