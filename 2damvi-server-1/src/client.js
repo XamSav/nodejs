@@ -1,1 +1,0 @@
-console.log('Scrip de Cliente.js funciona.');

@@ -1,12 +1,39 @@
-const neto = require("net");
+const path = require('path');
+const express = require("express");
+const app = express()
 
-const server = neto.createServer((c) =>{
-  console.log(`${c.remoteAddress} se ha conectado`);
-  c.write(Buffer.from("conectado", "utf-8"));
-  c.on("close", () => {
-    console.log("DESCONECTADO");
+// Puerto server
+const port = process.env.PORT || 80;
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+const server = app.listen(port, () => 
+    console.log("El servidor está inicializado en el puerto " + port
+));
+
+
+
+
+
+//Parte de Websocket
+const SocketIo = require('socket.io');
+
+//WebSockets
+const io = SocketIo(server);
+
+//Escuchar evento de conexion
+io.on('connection', (socket) =>{
+  console.log('nueva conexion', socket.id);
+
+  //Escuchar evento
+  socket.on('player:create',(data)=>{
+    //Emitir a todos los usuarios
+    io.sockets.emit('server:playercreated', data)
   });
-});
 
-const port = process.env.PORT || 8080;
-server.listen(port, () => console.log("El servidor está inicializado en el puerto " + port));
+  socket.on('player:onlyadata', (data) =>{
+    //Emitir a todos menos al cliente en cuestion.
+    socket.broadcast.emit('server:onlyadata')
+  })
+
+});
