@@ -25,8 +25,8 @@ var CatalogoHabilidades = [
 
 var players = [
     { position: "1", alias: "jperez", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: false, habilidad2: false},
-    { position: "2", alias: "jsanz", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidades: "Ninguna" },
-    { position: "3", alias: "mgutierrez", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidades: "Ninguna" }
+    { position: "2", alias: "jsanz", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidades: "?" },
+    { position: "3", alias: "mgutierrez", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidades: "?" }
 ];
 let response = {
     error: false,
@@ -197,7 +197,12 @@ app.get('/buycoins/:alias', function(req,res){
     }
     res.send(response);
 });
+function hey(){
+    console.log("Hey");
+}
 
-
-
-module.exports = app;
+module.exports = {
+    app,
+    hey
+}
+//module.exports = app;
