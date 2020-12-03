@@ -95,6 +95,27 @@
             }
           }
         }
+      },
+      "delete":{
+        "tags": ["Delete a Player"],
+        "summary": "Delete a Player",
+        "description": "Delete a specific player",
+        "parameters": [
+          {
+            "name": "alias",
+            "in": "path",
+            "description": "The Alias of the Player.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "100":{
+            "schema":{
+              "$ref":"#/definitions/codes"
+            }
+          }
+        }
       }
     },
     "/ranking": {

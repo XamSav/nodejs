@@ -1,8 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const { debug } = require("console");
-const app = express()
-
+const app = express();
+const fs = require('fs'); 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -34,7 +33,24 @@ let response = {
     code: 200,
     message: ''
 };
+function savejson(){
+    const str = JSON.stringify(players);
+    fs.writeFile('./src/player.json', str,'utf8', (err) => { 
+        if (err) throw err; 
+        console.log('The file has been saved!'); 
+    });
+}
 
+function getjson(){
+    fs.readFile('./src/player.json', 'utf8', (err, jsonString) => {
+        if (err) {
+            console.log("File read failed:", err)
+            return
+        }
+        players = JSON.parse(jsonString);
+    })
+}
+getjson();
 function UpdateRanking() {
     //Order the ranking
     players.sort((a, b) => (a.score <= b.score) ? 1 : -1);
@@ -43,6 +59,7 @@ function UpdateRanking() {
     for (var x = 0; x < players.length; x++) {
         players[x].position = x + 1;
     }
+    savejson();
 };
 
 app.get('/', function (req, res) {
@@ -51,13 +68,16 @@ app.get('/', function (req, res) {
 });
 
 app.get('/ranking', function (req, res) {
+    getjson();
     let ranking = { namebreplayers: players.length, players: players };
     res.send(ranking);
 });
 app.get('/players', function (req, res){
+    getjson();
     res.send(players);
 });
 app.get('/players/:alias', function (req, res) {
+    getjson();
     //Player Search
     var index = players.findIndex(j => j.alias === req.params.alias);
 
@@ -77,7 +97,7 @@ app.post('/players/:alias', function (req, res) {
     var paramName = req.body.name || '';
     var paramSurname = req.body.surname || '';
     var paramScore = req.body.score || '';
-
+    getjson();
     if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '') {
         response = codeError502;
     } else {
@@ -121,6 +141,7 @@ app.put('/players/:alias', function (req, res) {
     if (paramalias === '' || paramname === '' || paramsurname === '' || parseInt(paramScore) <= 0 || paramScore === '') {
         response = codeError502; //Paràmetres incomplerts
     } else {
+        getjson();
         //Player Search
         var index = players.findIndex(j => j.alias === paramalias)
 
@@ -145,7 +166,6 @@ app.put('/players/:alias', function (req, res) {
             //Response return
             response = code202;
             response.jugador = players[index];
-            
         } else {
             response = codeError504;
         }
@@ -156,21 +176,25 @@ app.put('/players/:alias', function (req, res) {
 //Borrar jugador by https://www.codegrepper.com/code-examples/c/delete+array+item+by+id+using+app.delete
 app.delete('/players/:alias', function(req,res){
     var paramalias = req.params.alias || '';
-
     if (paramalias === '') {
         response = codeError502; //Paràmetres incomplerts
     } 
     else{
+        getjson();
         //Player Search
-        var index = players.findIndex(j => j.alias === paramalias)
+        var index = players.findIndex(j => j.alias === paramalias);
+        var playerIndex = players.indexOf("Jugador");
         if (index != -1) {
             console.log("The player "+ paramalias+" has ben deleted");
             response = code203;
-            players.splice(index)
+            players.splice(index, 1);
+            //Sort the ranking
+            UpdateRanking();
         }
         else {
             response = codeError504;
         }
+        console.log(players[index]);
     }
     res.send(response);
 });
@@ -183,6 +207,7 @@ app.get('/buycoins/:alias', function(req,res){
         response = codeErrorBuy402;
     }
     else{
+        getjson();
         var index = players.findIndex(j => j.alias === paramalias)
         //Supongamos xk no tengo ni idea, que con 1 billetes se pilla 5 monedas. pos eso
         if(players[index].billetes < 1){

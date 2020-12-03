@@ -25,7 +25,7 @@ alias.addEventListener('keypress', function(){
 });
 
 socket.on('server:playercreated', (data) =>
-    console.log(data)
+    console.log("A new player has been created ",data)
 );
 socket.on('server:response', function(data){
     //Para acceder a un dato seria "data.alias"
