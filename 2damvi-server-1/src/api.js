@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const { debug } = require("console");
 const app = express()
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -163,8 +164,9 @@ app.delete('/players/:alias', function(req,res){
         //Player Search
         var index = players.findIndex(j => j.alias === paramalias)
         if (index != -1) {
+            console.log("The player "+ paramalias+" has ben deleted");
+            response = code203;
             players.splice(index)
-            
         }
         else {
             response = codeError504;
@@ -197,12 +199,25 @@ app.get('/buycoins/:alias', function(req,res){
     }
     res.send(response);
 });
-function hey(){
-    console.log("Hey");
+
+function searcher(data){
+                                                //El data.alias es el alias que envia el cliente (lo se por que hice un console 7.7)
+    var index = players.findIndex(j => j.alias === data.alias)
+    var ok = false;
+    //Si lo encuentra es false sino true
+    if (index != -1) {
+        ok = false;
+        console.log("El jugador "+ data.alias +" existe")
+    }else{
+        ok = true;
+        console.log("El jugador "+ data.alias +" no existe")
+    }
+    console.log(data)
+    return ok;
 }
 
 module.exports = {
     app,
-    hey
+    searcher
 }
 //module.exports = app;
