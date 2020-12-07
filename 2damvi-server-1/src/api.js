@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
+var router = express.Router();
 const fs = require('fs'); 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -62,21 +63,20 @@ function UpdateRanking() {
     savejson();
 };
 
-app.get('/', function (req, res) {
+router.get('/', function (req, res) {
     //code funciona ok
     res.send(code100);
 });
-
-app.get('/ranking', function (req, res) {
+router.get('/ranking', function (req, res) {
     getjson();
     let ranking = { namebreplayers: players.length, players: players };
     res.send(ranking);
 });
-app.get('/players', function (req, res){
+router.get('/players', function (req, res){
     getjson();
     res.send(players);
 });
-app.get('/players/:alias', function (req, res) {
+router.get('/players/:alias', function (req, res) {
     getjson();
     //Player Search
     var index = players.findIndex(j => j.alias === req.params.alias);
@@ -92,7 +92,7 @@ app.get('/players/:alias', function (req, res) {
     res.send(response);
 });
 
-app.post('/players/:alias', function (req, res) {
+router.post('/players/:alias', function (req, res) {
     var paramAlias = req.params.alias || '';
     var paramName = req.body.name || '';
     var paramSurname = req.body.surname || '';
@@ -132,7 +132,7 @@ app.post('/players/:alias', function (req, res) {
     res.send(response);
 });
 
-app.put('/players/:alias', function (req, res) {
+router.put('/players/:alias', function (req, res) {
     var paramalias = req.params.alias || '';
     var paramname = req.body.name || '';
     var paramsurname = req.body.surname || '';
@@ -174,7 +174,7 @@ app.put('/players/:alias', function (req, res) {
 });
 
 //Borrar jugador by https://www.codegrepper.com/code-examples/c/delete+array+item+by+id+using+app.delete
-app.delete('/players/:alias', function(req,res){
+router.delete('/players/:alias', function(req,res){
     var paramalias = req.params.alias || '';
     if (paramalias === '') {
         response = codeError502; //Paràmetres incomplerts
@@ -200,7 +200,7 @@ app.delete('/players/:alias', function(req,res){
 });
 
 //Comprar monedas con billetes
-app.get('/buycoins/:alias', function(req,res){
+router.get('/buycoins/:alias', function(req,res){
     var paramalias = req.params.alias || '';
     var parambilletes = req.body.billetes || '';
     if (paramalias === '' || parambilletes === '') {
@@ -241,8 +241,9 @@ function searcher(data){
     return ok;
 }
 
-module.exports = {
-    app,
-    searcher
-}
-//module.exports = app;
+/*module.exports = {
+    //app,
+    searcher,
+    router
+}*/
+module.exports = router;

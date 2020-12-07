@@ -1,8 +1,8 @@
-const path = require('path');
+/*const path = require('path');
 const express = require("express");
 const app = express();
 // Puerto server
-const port = /*process.env.PORT ||*/ 80;
+const port = process.env.PORT || 80;
 const apijs = require('./api.js');
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -48,5 +48,5 @@ io.on('connection', (socket) =>{
     //Emitir a todos menos al cliente en cuestion.
     socket.broadcast.emit('server:onlyadata')
   })
-  */
 });
+*/
