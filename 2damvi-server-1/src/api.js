@@ -225,8 +225,8 @@ router.get('/buycoins/:alias', function(req,res){
     res.send(response);
 });
 
-function searcher(data){
-                                                //El data.alias es el alias que envia el cliente (lo se por que hice un console 7.7)
+ function searcher(data) {
+                    //El data.alias es el alias que envia el cliente (lo se por que hice un console 7.7)
     var index = players.findIndex(j => j.alias === data.alias)
     var ok = false;
     //Si lo encuentra es false sino true
@@ -247,3 +247,4 @@ function searcher(data){
     router
 }*/
 module.exports = router;
+module.exports.searcher = searcher;
