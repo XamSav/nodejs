@@ -10,6 +10,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //ApiJS
 var apijs = require('./api.js');
 var { searcher } = require('./api.js');
+var { createPlayer } = require('./api.js');
 app.use('/', apijs);
 app.use(express.urlencoded({ extended: false }));
 
@@ -36,6 +37,7 @@ io.on('connection', (socket) =>{
       var ok = apijs.searcher(data);
       //Emitir a todos los usuarios
       if(ok === true){
+        apijs.createPlayer(data.alias, data.name, data.surname, data.score);
         io.sockets.emit('server:playercreated', data)
         console.log("Ok");
       }else{
