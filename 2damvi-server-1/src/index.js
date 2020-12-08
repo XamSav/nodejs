@@ -1,47 +1,48 @@
 'use strict';
 const path = require('path');
 const express = require("express");
-const bodyParser = require("body-parser");
 var app = express()
+//const bodyParser = require("body-parser");
+
 //Swagger
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-//ApiJS
+
+//ApiJS para WebSocket
 var apijs = require('./api.js');
 var { searcher } = require('./api.js');
 var { createPlayer } = require('./api.js');
-app.use('/', apijs);
-app.use(express.urlencoded({ extended: false }));
-
-//HTML
-app.use(express.static(path.join(__dirname, 'public')));
-
+var { comprobadorDeDatos } = require('./api.js');
 
 //Configuracion principal del Servidor
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 80;
 const server = app.listen(port, () => 
     console.log("El servidor está inicializado en el puerto " + port
 ));
 
-//WebSockeys
+//WebSockets
 const SocketIo = require('socket.io');
 const io = SocketIo(server);
 
 io.on('connection', (socket) =>{
     console.log('Nueva conexion de', socket.id);
-    
+    io.sockets.emit('Conectado');
     //Escuchar evento
       //Crear un jugador
     socket.on('player:create',(data)=>{
-      var ok = apijs.searcher(data);
+      var ok = apijs.searcher(data.alias);
+      var hey = apijs.comprobadorDeDatos(data.alias, data.name, data.surname, data.score);
       //Emitir a todos los usuarios
       if(ok === true){
-        apijs.createPlayer(data.alias, data.name, data.surname, data.score);
-        io.sockets.emit('server:playercreated', data)
-        console.log("Ok");
+        if(hey === true){
+          apijs.createPlayer(data.alias, data.name, data.surname, data.score);
+          io.sockets.emit('server:playercreated', data)
+        }else{
+          console.log("Parametros incorrectos");
+        }
       }else{
-        console.log("No"); 
+        console.log("Ya hay un usuario en con ese alias"); 
       }
     });
   
@@ -63,5 +64,11 @@ io.on('connection', (socket) =>{
       socket.broadcast.emit('server:onlyadata')
     })*/
 });
+
+//Uso de ApiJS
+app.use('/', apijs);
+app.use(express.urlencoded({ extended: false }));
+//HTML
+app.use(express.static(path.join(__dirname, 'public')));
 
 module.exports = app;

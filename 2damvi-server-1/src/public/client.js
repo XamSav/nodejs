@@ -15,7 +15,7 @@ btn.addEventListener('click', function(){
         alias: alias.value,
         name: name.value,
         surname: surname.value,
-        score: score.value
+        score: parseInt(score.value)
     });
 });
 

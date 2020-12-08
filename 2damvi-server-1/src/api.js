@@ -54,6 +54,7 @@ function getjson(){
 }
 getjson();
 function UpdateRanking() {
+    getjson();
     //Order the ranking
     players.sort((a, b) => (a.score <= b.score) ? 1 : -1);
 
@@ -70,7 +71,7 @@ router.get('/', function (req, res) {
     res.send(code100);
 });
 router.get('/ranking', function (req, res) {
-    getjson();
+    UpdateRanking();
     let ranking = { namebreplayers: players.length, players: players };
     res.send(ranking);
 });
@@ -99,7 +100,7 @@ router.post('/players/:alias', jsonParser   ,function (req, res) {
     var paramSurname = req.body.surname || '';
     var paramScore = req.body.score || '';
     getjson();
-    if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '') {
+    if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '' || isNaN(paramScore)) {
         response = codeError502;
     } else {
         
@@ -175,34 +176,25 @@ router.get('/buycoins/:alias', function(req,res){
 });
 
 function createPlayer(paramAlias, paramName, paramSurname, paramScore){
-    //Player Search
-    var index = players.findIndex(j => j.alias === paramAlias)
-
-    if (index != -1) {
-        //Player allready exists
-        response = codeError503;
-    } else {
-        //Add Player
-        players.push({ 
-            position: '', 
-            alias: paramAlias, 
-            name: paramName, 
-            surname: paramSurname, 
-            score: paramScore ,
-            created: new Date(),
-            coins: 10,
-            billetes: 5,
-            habilidades: "Ninguna"
-        });
-        //Sort the ranking
-        UpdateRanking();
-        //Search Player Again
-        index = players.findIndex(j => j.alias === paramAlias);
-        //Response return
-        response = code201;
-        response.player = players[index];
-        
-    }
+    //Add Player
+    players.push({ 
+        position: '', 
+        alias: paramAlias, 
+        name: paramName, 
+        surname: paramSurname, 
+        score: paramScore ,
+        created: new Date(),
+        coins: 10,
+        billetes: 5,
+        habilidades: "Ninguna"
+    });
+    //Sort the ranking
+    UpdateRanking();
+    //Search Player Again
+    index = players.findIndex(j => j.alias === paramAlias);
+    //Response return
+    response = code201;
+    response.player = players[index];
     return response;
 }
 function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
@@ -242,7 +234,8 @@ function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
 }
 
  function searcher(data) {
-                    //El data.alias es el alias que envia el cliente (lo se por que hice un console 7.7)
+    getjson();
+    //El data.alias es el alias que envia el cliente (lo se por que hice un console 7.7)
     var index = players.findIndex(j => j.alias === data.alias)
     var ok = false;
     //Si lo encuentra es false sino true
@@ -256,7 +249,16 @@ function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
     console.log(data)
     return ok;
 }
-
+function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramScore){
+    getjson();
+    var hey = false;
+    if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '' || isNaN(paramScore) || paramScore === null){
+        hey = false;
+    }else{
+        hey = true;
+    }
+    return hey;
+}
 /*module.exports = {
     //app,
     searcher,
@@ -265,3 +267,4 @@ function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
 module.exports = router;
 module.exports.searcher = searcher;
 module.exports.createPlayer = createPlayer;
+module.exports.comprobadorDeDatos = comprobadorDeDatos;
