@@ -14,9 +14,9 @@ var apijs = require('./api.js');
 var { searcher } = require('./api.js');
 var { createPlayer } = require('./api.js');
 var { comprobadorDeDatos } = require('./api.js');
-
+var { enviarJugadores } = require('./api.js');
 //Configuracion principal del Servidor
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 4567;
 const server = app.listen(port, () => 
     console.log("El servidor está inicializado en el puerto " + port
 ));
@@ -27,8 +27,27 @@ const io = SocketIo(server);
 
 io.on('connection', (socket) =>{
     console.log('Nueva conexion de', socket.id);
-    io.sockets.emit('Conectado');
     //Escuchar evento
+  ///PRUEBAS///
+
+  
+  socket.on('player:look',(data)=>{
+    var player = apijs.enviarJugadores(data);
+    if(player === false){
+      socket.emit('noexist', false);
+    }
+    else{
+      socket.emit('jugadores', player);
+    }
+  })
+  
+
+
+
+
+
+
+  ///CODIGO BUENO///
       //Crear un jugador
     socket.on('player:create',(data)=>{
       var ok = apijs.searcher(data.alias);

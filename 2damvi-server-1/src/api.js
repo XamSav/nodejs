@@ -259,6 +259,14 @@ function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramScore){
     }
     return hey;
 }
+function enviarJugadores(data){
+    if(data < 0 || data > players.length){
+        data = false;
+        return data;
+    }else{
+    return players[data];
+    }
+}
 /*module.exports = {
     //app,
     searcher,
@@ -268,3 +276,4 @@ module.exports = router;
 module.exports.searcher = searcher;
 module.exports.createPlayer = createPlayer;
 module.exports.comprobadorDeDatos = comprobadorDeDatos;
+module.exports.enviarJugadores = enviarJugadores;
