@@ -32,7 +32,7 @@ io.on('connection', (socket) =>{
 
   
   socket.on('player:look',(data)=>{
-    var player = apijs.enviarJugadores(data);
+    var player = apijs.enviarJugadores(parseInt(data));
     if(player === false){
       socket.emit('noexist', false);
     }
