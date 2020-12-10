@@ -5,9 +5,8 @@ var router = express.Router();
 const fs = require('fs'); 
 var jsonParser = bodyParser.json()
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
+router.use(bodyParser.urlencoded({ extended: false }));
+router.use(bodyParser.json());
 let code100 = { code: 100, error: false, message: '2-DAMVI Server Up' };
 let code200 = { code: 200, error: false, message: 'Player Exists' };
 let code201 = { code: 201, error: false, message: 'Player Correctly Created' };
@@ -52,12 +51,12 @@ function getjson(){
         players = JSON.parse(jsonString);
     })
 }
+
+
 getjson();
 function UpdateRanking() {
-    getjson();
     //Order the ranking
     players.sort((a, b) => (a.score <= b.score) ? 1 : -1);
-
     //Position Update
     for (var x = 0; x < players.length; x++) {
         players[x].position = x + 1;
@@ -75,12 +74,7 @@ router.get('/ranking', function (req, res) {
     let ranking = { namebreplayers: players.length, players: players };
     res.send(ranking);
 });
-router.get('/players', function (req, res){
-    getjson();
-    res.send(players);
-});
 router.get('/players/:alias', function (req, res) {
-    getjson();
     //Player Search
     var index = players.findIndex(j => j.alias === req.params.alias);
 
@@ -98,18 +92,41 @@ router.post('/players/:alias', jsonParser   ,function (req, res) {
     var paramAlias = req.params.alias || '';
     var paramName = req.body.name || '';
     var paramSurname = req.body.surname || '';
-    var paramScore = req.body.score || '';
-    getjson();
-    if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '' || isNaN(paramScore)) {
+    if (paramAlias === '' || paramName === '' || paramSurname === '') {
         response = codeError502;
     } else {
-        
-        response = createPlayer(paramAlias, paramName, paramSurname, paramScore);
-        
+        //Player Search
+        var index = players.findIndex(j => j.alias === paramAlias)
+
+        if (index != -1) {
+            //Player allready exists
+            response = codeError503;
+        } else {
+            //Add Player
+            players.push({ 
+                position: '', 
+                alias: paramAlias, 
+                name: paramName, 
+                surname: paramSurname, 
+                score: 0,
+                created: new Date(),
+                coins: 10,
+                billetes: 5,
+                habilidad1: 0,
+                habilidad2: 0
+            });
+            //Sort the ranking
+            UpdateRanking();
+            //Search Player Again
+            index = players.findIndex(j => j.alias === paramAlias);
+            //Response return
+            response = code201;
+            response.player = players[index];
+        }
     }
     res.send(response);
-});
 
+});
 router.put('/players/:alias',jsonParser, function (req, res) {
     var paramAlias = req.params.alias || '';
     var paramName = req.body.name || '';
@@ -157,7 +174,6 @@ router.get('/buycoins/:alias', function(req,res){
         response = codeErrorBuy402;
     }
     else{
-        getjson();
         var index = players.findIndex(j => j.alias === paramAlias)
         //Supongamos xk no tengo ni idea, que con 1 billetes se pilla 5 monedas. pos eso
         if(players[index].billetes < 1){
@@ -170,6 +186,8 @@ router.get('/buycoins/:alias', function(req,res){
             players[index].coins += ganancia;
             response = codeBuy401;
             response.jugador = players[index];
+            savejson();
+            getjson();
         }
     }
     res.send(response);
@@ -189,10 +207,10 @@ function searcher(data) {
     var ok = false;
     //Si lo encuentra es false sino true
     if (index != -1) {
-        ok = false;
+        ok = true;
         console.log("El jugador "+ data.alias +" existe")
     }else{
-        ok = true;
+        ok = false;
         console.log("El jugador "+ data.alias +" no existe")
     }
     console.log(data)
@@ -212,32 +230,6 @@ function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramScore){
 
 
 /////ACCIONES/////
-
-    //CREAR
-function createPlayer(paramAlias, paramName, paramSurname, paramScore){
-    //Add Player
-    players.push({ 
-        position: '', 
-        alias: paramAlias, 
-        name: paramName, 
-        surname: paramSurname, 
-        score: paramScore ,
-        created: new Date(),
-        coins: 10,
-        billetes: 5,
-        habilidad1: 0, 
-        habilidad2: 0
-    });
-    //Sort the ranking
-    UpdateRanking();
-    //Search Player Again
-    index = players.findIndex(j => j.alias === paramAlias);
-    //Response return
-    response = code201;
-    response.player = players[index];
-    return response;
-}
-
     //OBTENER
         //SOLO 1 JUGADOR
     function enviarJugador(data){
@@ -254,8 +246,8 @@ function createPlayer(paramAlias, paramName, paramSurname, paramScore){
         getjson();
         return players;
     }
-
-    //Actualizar
+    //EDITAR
+        //Actualizar cualquier cosa del jugador
 function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
     getjson();
     if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === ''){
@@ -292,7 +284,24 @@ function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
 }
     return response;
 }
-
+    //COMPRAR MONEDAS
+function buyCoins(paramAlias){
+    var index = players.findIndex(j => j.alias === paramAlias)
+        //Supongamos xk no tengo ni idea, que con 1 billetes se pilla 5 monedas. pos eso
+        if(players[index].billetes < 1){
+            response = codeErrorBuy403;
+        }
+        else{
+            var precio = 1;
+            var ganancia = 5;
+            players[index].billetes -= precio;
+            players[index].coins += ganancia;
+            response = codeBuy401;
+            response.jugador = players[index];
+            savejson();
+            getjson();
+        }
+}
  
 
 
@@ -307,13 +316,14 @@ module.exports = router;
 module.exports.searcher = searcher;
 module.exports.comprobadorDeDatos = comprobadorDeDatos;
 //Acciones
-    //Crear
-module.exports.createPlayer = createPlayer;
     //Obtener
         //Solo 1
 module.exports.enviarJugador = enviarJugador;
         //Todos
 module.exports.enviarJugadores = enviarJugadores;
     //Actualizar
+        //Cualquier cosa del jugador
 module.exports.updatePlayer = updatePlayer;
+        //Comprar Monedas
+module.exports.buyCoins = buyCoins;
     //Eliminar

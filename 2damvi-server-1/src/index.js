@@ -2,7 +2,7 @@
 const path = require('path');
 const express = require("express");
 var app = express()
-//const bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
 
 //Swagger
 const swaggerUi = require('swagger-ui-express');
@@ -12,10 +12,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //ApiJS para WebSocket
 var apijs = require('./api.js');
 var { searcher } = require('./api.js');
-var { createPlayer } = require('./api.js');
 var { comprobadorDeDatos } = require('./api.js');
 var { enviarJugador } = require('./api.js');
 var { enviarJugadores } = require('./api.js');
+var { updatePlayers } = require('./api.js');
 //Configuracion principal del Servidor
 const port = process.env.PORT || 4567;
 const server = app.listen(port, () => 
@@ -47,36 +47,32 @@ io.on('connection', (socket) =>{
     console.log(players)
     socket.emit('jugadores', players);
   });
-
-
   ///CODIGO BUENO///
-  //Crear un jugador
-  socket.on('player:create',(data)=>{
-    var ok = apijs.searcher(data.alias);
-    var hey = apijs.comprobadorDeDatos(data.alias, data.name, data.surname, data.score);
-    //Emitir a todos los usuarios
-    if(ok === true){
-      if(hey === true){
-        apijs.createPlayer(data.alias, data.name, data.surname, data.score);
-        io.sockets.emit('server:playercreated', data)
-      }else{
-        console.log("Parametros incorrectos");
-      }
-    }else{
-      console.log("Ya hay un usuario en con ese alias"); 
-    }
-  });
 
     //Actualizar un jugador
   socket.on('player:playerupdate',(data)=>{
+    var ok = apijs.searcher(data.alias);
+    var hey = apijs.comprobadorDeDatos(data.alias, data.name, data.surname, data.score);
+    if(ok === true){
+        apijs.updatePlayer(data.alias, data.name, data.surname, data.score);
+        io.sockets.emit('server:playercreated', data)
     //Emitir a todos los usuarios
     io.sockets.emit('server:playerupdate', data)
+    }    
+    else{
+      console.log("No hay ningun usuario con ese alias"); 
+    }
   });
 
     //Compra de Coins
   socket.on('player:buycoin',(data)=>{
     //Emitir a todos los usuarios
-    io.sockets.emit('server:buyshop', data)
+    io.sockets.emit('server:buycoin', data)
+  });
+  //Aumentar de Habilidad
+  socket.on('player:powerup',(data)=>{
+    //Emitir a todos los usuarios
+    io.sockets.emit('server:powerup', data)
   });
 
     /*
