@@ -27,9 +27,9 @@ var CatalogoHabilidades = [
 ];
 
 var players = [
-    { position: "1", alias: "jperez", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: false, habilidad2: false},
-    { position: "2", alias: "jsanz", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidades: "?" },
-    { position: "3", alias: "mgutierrez", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidades: "?" }
+    { position: "1", alias: "jperez", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0},
+    { position: "2", alias: "jsanz", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 },
+    { position: "3", alias: "mgutierrez", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 }
 ];
 let response = {
     error: false,
@@ -175,6 +175,45 @@ router.get('/buycoins/:alias', function(req,res){
     res.send(response);
 });
 
+
+
+
+////////////////FUNCIONES/////////////////////
+
+/////COMPROBANTES/////
+    //Busca si el jugador que pide existe o no.
+function searcher(data) {
+    getjson();
+    //El data.alias es el alias que envia el cliente (lo se por que hice un console 7.7)
+    var index = players.findIndex(j => j.alias === data.alias)
+    var ok = false;
+    //Si lo encuentra es false sino true
+    if (index != -1) {
+        ok = false;
+        console.log("El jugador "+ data.alias +" existe")
+    }else{
+        ok = true;
+        console.log("El jugador "+ data.alias +" no existe")
+    }
+    console.log(data)
+    return ok;
+}
+    //Comprueba que todos los campos son correctos
+function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramScore){
+    getjson();
+    var hey = false;
+    if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '' || isNaN(paramScore) || paramScore === null){
+        hey = false;
+    }else{
+        hey = true;
+    }
+    return hey;
+}
+
+
+/////ACCIONES/////
+
+    //CREAR
 function createPlayer(paramAlias, paramName, paramSurname, paramScore){
     //Add Player
     players.push({ 
@@ -186,7 +225,8 @@ function createPlayer(paramAlias, paramName, paramSurname, paramScore){
         created: new Date(),
         coins: 10,
         billetes: 5,
-        habilidades: "Ninguna"
+        habilidad1: 0, 
+        habilidad2: 0
     });
     //Sort the ranking
     UpdateRanking();
@@ -197,6 +237,25 @@ function createPlayer(paramAlias, paramName, paramSurname, paramScore){
     response.player = players[index];
     return response;
 }
+
+    //OBTENER
+        //SOLO 1 JUGADOR
+    function enviarJugador(data){
+        getjson();
+        if(data < 0 || data > players.length){
+            data = false;
+            return data;
+        }else{
+        return players[data];
+        }
+    }
+        //TODOS LOS JUGADORES
+    function enviarJugadores(){
+        getjson();
+        return players;
+    }
+
+    //Actualizar
 function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
     getjson();
     if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === ''){
@@ -217,7 +276,8 @@ function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
             updated: new Date(),
             coins: 10,
             billetes: 5,
-            habilidades: "Ninguna"
+            habilidad1: 0,
+            habilidad2: 0
         };
         //Sort the ranking
         UpdateRanking();
@@ -233,47 +293,27 @@ function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
     return response;
 }
 
- function searcher(data) {
-    getjson();
-    //El data.alias es el alias que envia el cliente (lo se por que hice un console 7.7)
-    var index = players.findIndex(j => j.alias === data.alias)
-    var ok = false;
-    //Si lo encuentra es false sino true
-    if (index != -1) {
-        ok = false;
-        console.log("El jugador "+ data.alias +" existe")
-    }else{
-        ok = true;
-        console.log("El jugador "+ data.alias +" no existe")
-    }
-    console.log(data)
-    return ok;
-}
-function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramScore){
-    getjson();
-    var hey = false;
-    if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '' || isNaN(paramScore) || paramScore === null){
-        hey = false;
-    }else{
-        hey = true;
-    }
-    return hey;
-}
-function enviarJugadores(data){
-    if(data < 0 || data > players.length){
-        data = false;
-        return data;
-    }else{
-    return players[data];
-    }
-}
+ 
+
+
+
 /*module.exports = {
     //app,
     searcher,
     router
 }*/
 module.exports = router;
+///Comprobantes
 module.exports.searcher = searcher;
-module.exports.createPlayer = createPlayer;
 module.exports.comprobadorDeDatos = comprobadorDeDatos;
+//Acciones
+    //Crear
+module.exports.createPlayer = createPlayer;
+    //Obtener
+        //Solo 1
+module.exports.enviarJugador = enviarJugador;
+        //Todos
 module.exports.enviarJugadores = enviarJugadores;
+    //Actualizar
+module.exports.updatePlayer = updatePlayer;
+    //Eliminar

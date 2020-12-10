@@ -14,6 +14,7 @@ var apijs = require('./api.js');
 var { searcher } = require('./api.js');
 var { createPlayer } = require('./api.js');
 var { comprobadorDeDatos } = require('./api.js');
+var { enviarJugador } = require('./api.js');
 var { enviarJugadores } = require('./api.js');
 //Configuracion principal del Servidor
 const port = process.env.PORT || 4567;
@@ -30,58 +31,59 @@ io.on('connection', (socket) =>{
     //Escuchar evento
   ///PRUEBAS///
 
-  
+  //Mirar 1 Jugador
   socket.on('player:look',(data)=>{
-    var player = apijs.enviarJugadores(parseInt(data));
+    var player = apijs.enviarJugador(parseInt(data));
     if(player === false){
       socket.emit('noexist', false);
     }
     else{
-      socket.emit('jugadores', player);
+      socket.emit('jugador', player);
     }
-  })
-  
-
-
-
-
+  });
+  //Mirar Varios Jugadores
+  socket.on('players:look', () =>{
+    var players = apijs.enviarJugadores();
+    console.log(players)
+    socket.emit('jugadores', players);
+  });
 
 
   ///CODIGO BUENO///
-      //Crear un jugador
-    socket.on('player:create',(data)=>{
-      var ok = apijs.searcher(data.alias);
-      var hey = apijs.comprobadorDeDatos(data.alias, data.name, data.surname, data.score);
-      //Emitir a todos los usuarios
-      if(ok === true){
-        if(hey === true){
-          apijs.createPlayer(data.alias, data.name, data.surname, data.score);
-          io.sockets.emit('server:playercreated', data)
-        }else{
-          console.log("Parametros incorrectos");
-        }
+  //Crear un jugador
+  socket.on('player:create',(data)=>{
+    var ok = apijs.searcher(data.alias);
+    var hey = apijs.comprobadorDeDatos(data.alias, data.name, data.surname, data.score);
+    //Emitir a todos los usuarios
+    if(ok === true){
+      if(hey === true){
+        apijs.createPlayer(data.alias, data.name, data.surname, data.score);
+        io.sockets.emit('server:playercreated', data)
       }else{
-        console.log("Ya hay un usuario en con ese alias"); 
+        console.log("Parametros incorrectos");
       }
-    });
-  
-      //Actualizar un jugador
-    socket.on('player:playerupdate',(data)=>{
-      //Emitir a todos los usuarios
-      io.sockets.emit('server:playerupdate', data)
-    });
-  
-      //Compra de Coins
-    socket.on('player:buycoin',(data)=>{
-      //Emitir a todos los usuarios
-      io.sockets.emit('server:buyshop', data)
-    });
-  
-      /*
-    socket.on('player:onlyadata', (data) =>{
-      //Emitir a todos menos al cliente en cuestion.
-      socket.broadcast.emit('server:onlyadata')
-    })*/
+    }else{
+      console.log("Ya hay un usuario en con ese alias"); 
+    }
+  });
+
+    //Actualizar un jugador
+  socket.on('player:playerupdate',(data)=>{
+    //Emitir a todos los usuarios
+    io.sockets.emit('server:playerupdate', data)
+  });
+
+    //Compra de Coins
+  socket.on('player:buycoin',(data)=>{
+    //Emitir a todos los usuarios
+    io.sockets.emit('server:buyshop', data)
+  });
+
+    /*
+  socket.on('player:onlyadata', (data) =>{
+    //Emitir a todos menos al cliente en cuestion.
+    socket.broadcast.emit('server:onlyadata')
+  })*/
 });
 
 //Uso de ApiJS
