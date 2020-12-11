@@ -295,7 +295,12 @@ function buyCoins(paramAlias){
             var ganancia = 5;
             players[index].billetes -= precio;
             players[index].coins += ganancia;
-            response.jugador = players[index];
+            let jugadorjson = {
+                alias: players[index].alias,
+                coins: players[index].coins,
+                billete: players[index].billetes,
+            }
+            response.jugadorjson = jugadorjson;
             savejson();
             getjson();
             //console.log(players[index].coins)

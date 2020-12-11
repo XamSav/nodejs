@@ -75,7 +75,7 @@ io.on('connection', (socket) =>{
       var response = buyCoins(data);
       io.sockets.emit('server:buycoin', response)
     }else{
-      io.sockets.emit('error', "Fallo al comprar monedas")
+      io.sockets.emit('error', "No existe ese usuario")
     }
   });
   //Aumentar de Habilidad
