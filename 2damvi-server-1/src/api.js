@@ -300,7 +300,7 @@ function buyCoins(paramAlias){
                 coins: players[index].coins,
                 billete: players[index].billetes,
             }
-            response.jugadorjson = jugadorjson;
+            response = jugadorjson;
             savejson();
             getjson();
             //console.log(players[index].coins)
