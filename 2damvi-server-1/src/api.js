@@ -298,7 +298,7 @@ function buyCoins(paramAlias){
             response.jugador = players[index];
             savejson();
             getjson();
-            console.log(players[index].coins)
+            //console.log(players[index].coins)
         }
         return response;
 }
