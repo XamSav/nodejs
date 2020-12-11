@@ -13,6 +13,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 var apijs = require('./api.js');
 var { searcher } = require('./api.js');
 var { comprobadorDeDatos } = require('./api.js');
+//var { comprobarcontra } = require('./api.js');
 var { enviarJugador } = require('./api.js');
 var { enviarJugadores } = require('./api.js');
 var { updatePlayers } = require('./api.js');

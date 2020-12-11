@@ -26,9 +26,9 @@ var CatalogoHabilidades = [
 ];
 
 var players = [
-    { position: "1", alias: "jperez", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0},
-    { position: "2", alias: "jsanz", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 },
-    { position: "3", alias: "mgutierrez", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 }
+    { position: "1", alias: "jperez", password:"123", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0},
+    { position: "2", alias: "jsanz", password:"123", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 },
+    { position: "3", alias: "mgutierrez", password:"123", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 }
 ];
 let response = {
     error: false,
@@ -215,6 +215,15 @@ function searcher(data) {
     }
     return ok;
 }
+    //Comprueba si la contraseña esta bien (Usar para Api Rest)
+function comprobarcontra(data){
+    var index = players.findIndex(j => j.alias === paramAlias);
+    if(data.password === players[index].password){
+        return true;
+    }else{
+        return false;
+    }
+}
     //Comprueba que todos los campos son correctos
 function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramScore){
     getjson();
@@ -320,6 +329,7 @@ module.exports = router;
 ///Comprobantes
 module.exports.searcher = searcher;
 module.exports.comprobadorDeDatos = comprobadorDeDatos;
+//module.exports.comprobarcontra = comprobarcontra;
 //Acciones
     //Obtener
         //Solo 1
