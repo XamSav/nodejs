@@ -16,6 +16,7 @@ var { comprobadorDeDatos } = require('./api.js');
 var { enviarJugador } = require('./api.js');
 var { enviarJugadores } = require('./api.js');
 var { updatePlayers } = require('./api.js');
+var { buyCoins } = require('./api.js');
 //Configuracion principal del Servidor
 const port = process.env.PORT || 4567;
 const server = app.listen(port, () => 
@@ -30,12 +31,11 @@ io.on('connection', (socket) =>{
     console.log('Nueva conexion de', socket.id);
     //Escuchar evento
   ///PRUEBAS///
-
   //Mirar 1 Jugador
   socket.on('player:look',(data)=>{
     var player = apijs.enviarJugador(parseInt(data));
     if(player === false){
-      socket.emit('noexist', false);
+      socket.emit('error', "The player does not exist");
     }
     else{
       socket.emit('jugador', player);
@@ -54,20 +54,29 @@ io.on('connection', (socket) =>{
     var ok = apijs.searcher(data.alias);
     var hey = apijs.comprobadorDeDatos(data.alias, data.name, data.surname, data.score);
     if(ok === true){
+      if(hey === true){
         apijs.updatePlayer(data.alias, data.name, data.surname, data.score);
-        io.sockets.emit('server:playercreated', data)
-    //Emitir a todos los usuarios
-    io.sockets.emit('server:playerupdate', data)
+        io.sockets.emit('server:playerupdate', data)
+      }else{
+        io.sockets.emit('error', "Uno de los parametros es erróneo");
+        console.log("Uno de los parametros es erróneo");
+      }    
     }    
     else{
+      io.sockets.emit('error',"No hay ningun usuario con ese alias");
       console.log("No hay ningun usuario con ese alias"); 
     }
   });
 
     //Compra de Coins
   socket.on('player:buycoin',(data)=>{
-    //Emitir a todos los usuarios
-    io.sockets.emit('server:buycoin', data)
+    var ok = apijs.searcher(data);
+    if(ok === true){
+      var response = buyCoins(data);
+      io.sockets.emit('server:buycoin', response)
+    }else{
+      io.sockets.emit('error', "Fallo al comprar monedas")
+    }
   });
   //Aumentar de Habilidad
   socket.on('player:powerup',(data)=>{

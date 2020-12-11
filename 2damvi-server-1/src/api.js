@@ -203,17 +203,16 @@ router.get('/buycoins/:alias', function(req,res){
 function searcher(data) {
     getjson();
     //El data.alias es el alias que envia el cliente (lo se por que hice un console 7.7)
-    var index = players.findIndex(j => j.alias === data.alias)
+    var index = players.findIndex(j => j.alias === data)
     var ok = false;
     //Si lo encuentra es false sino true
     if (index != -1) {
         ok = true;
-        console.log("El jugador "+ data.alias +" existe")
+        //console.log("El jugador "+ data +" existe")
     }else{
         ok = false;
-        console.log("El jugador "+ data.alias +" no existe")
+        //console.log("El jugador "+ data +" no existe")
     }
-    console.log(data)
     return ok;
 }
     //Comprueba que todos los campos son correctos
@@ -296,11 +295,12 @@ function buyCoins(paramAlias){
             var ganancia = 5;
             players[index].billetes -= precio;
             players[index].coins += ganancia;
-            response = codeBuy401;
             response.jugador = players[index];
             savejson();
             getjson();
+            console.log(players[index].coins)
         }
+        return response;
 }
  
 
