@@ -20,12 +20,12 @@ let codeError504 = { code: 504, error: true, message: 'Error: Player not found' 
 let codeBuy401 = { code: 401, error: false, message: 'Purchase made' };
 let codeErrorBuy402 = { code: 402, error: true, message: 'Error: Please specify the alias or the number of billetes to buy'};
 let codeErrorBuy403 = { code: 403, error: true, message: "Error: You don't have enough points"};
-
+//Errores Login
+let codeLogin501 = {code: 501, error: true, message: 'Contraseña Incorrecta'};
 var CatalogoHabilidades = [
     {nombre: "Bola de fuego", id: 1},
     {nombre: "Flash", id: 2 }
 ];
-
 var players = [
     { position: "1", alias: "jperez", password:"a9993e364706816aba3e25717850c26c9cd0d89d", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0},
     { position: "2", alias: "jsanz", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 },
@@ -92,7 +92,8 @@ router.post('/players/:alias', jsonParser   ,function (req, res) {
     var paramAlias = req.params.alias || '';
     var paramName = req.body.name || '';
     var paramSurname = req.body.surname || '';
-    if (paramAlias === '' || paramName === '' || paramSurname === '') {
+    var paramPassword = req.body.password || '';
+    if (paramAlias === '' || paramName === '' || paramSurname === '' || paramPassword === '') {
         response = codeError502;
     } else {
         //Player Search
@@ -107,7 +108,8 @@ router.post('/players/:alias', jsonParser   ,function (req, res) {
                 position: '', 
                 alias: paramAlias, 
                 name: paramName, 
-                surname: paramSurname, 
+                surname: paramSurname,
+                password: paramPassword, 
                 score: 0,
                 created: new Date(),
                 coins: 10,
@@ -199,6 +201,8 @@ router.get('/login/:alias/:password', function(req,res){
     var ok = login(paramAlias, paramPassword);
     if(ok !== false){
         res.send(ok);
+    }else{
+        res.send("Error");
     }
 });
 
@@ -228,7 +232,6 @@ function login(paramAlias, paramPassword){
     ok = searcher(paramAlias);
     if(ok === true){
         var index = players.findIndex(j => j.alias === paramAlias);
-        console.log(paramPassword);
         if(paramPassword === players[index].password){
             return players[index];
         }else{
