@@ -27,9 +27,9 @@ var CatalogoHabilidades = [
 ];
 
 var players = [
-    { position: "1", alias: "jperez", password:"abc", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0},
-    { position: "2", alias: "jsanz", password:"123", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 },
-    { position: "3", alias: "mgutierrez", password:"123", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 }
+    { position: "1", alias: "jperez", password:"a9993e364706816aba3e25717850c26c9cd0d89d", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0},
+    { position: "2", alias: "jsanz", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 },
+    { position: "3", alias: "mgutierrez", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 }
 ];
 let response = {
     error: false,
@@ -227,7 +227,8 @@ function searcher(data) {
 function login(paramAlias, paramPassword){
     ok = searcher(paramAlias);
     if(ok === true){
-        var index = players.findIndex(j => j.alias === paramAlias)
+        var index = players.findIndex(j => j.alias === paramAlias);
+        console.log(paramPassword);
         if(paramPassword === players[index].password){
             return players[index];
         }else{
@@ -240,6 +241,8 @@ function login(paramAlias, paramPassword){
         return false;
     }
 }
+
+
     //Comprueba que todos los campos son correctos
 function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramScore){
     getjson();
