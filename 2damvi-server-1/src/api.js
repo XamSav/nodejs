@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const app = express();
 var router = express.Router();
 const fs = require('fs'); 
+const { debug, error } = require("console");
 var jsonParser = bodyParser.json()
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 router.use(bodyParser.urlencoded({ extended: false }));
@@ -26,7 +27,7 @@ var CatalogoHabilidades = [
 ];
 
 var players = [
-    { position: "1", alias: "jperez", password:"123", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0},
+    { position: "1", alias: "jperez", password:"abc", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0},
     { position: "2", alias: "jsanz", password:"123", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 },
     { position: "3", alias: "mgutierrez", password:"123", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 }
 ];
@@ -51,7 +52,6 @@ function getjson(){
         players = JSON.parse(jsonString);
     })
 }
-
 
 getjson();
 function UpdateRanking() {
@@ -193,6 +193,14 @@ router.get('/buycoins/:alias', function(req,res){
     res.send(response);
 });
 
+router.get('/login/:alias/:password', function(req,res){
+    var paramAlias = req.params.alias || '';
+    var paramPassword = req.params.password || '';
+    var ok = login(paramAlias, paramPassword);
+    if(ok !== false){
+        res.send(ok);
+    }
+});
 
 
 
@@ -216,11 +224,19 @@ function searcher(data) {
     return ok;
 }
     //Comprueba si la contraseña esta bien (Usar para Api Rest)
-function comprobarcontra(data){
-    var index = players.findIndex(j => j.alias === paramAlias);
-    if(data.password === players[index].password){
-        return true;
-    }else{
+function login(paramAlias, paramPassword){
+    ok = searcher(paramAlias);
+    if(ok === true){
+        var index = players.findIndex(j => j.alias === paramAlias)
+        if(paramPassword === players[index].password){
+            return players[index];
+        }else{
+            //Contraseña incorrecta
+            return false;
+        }
+    }
+    else{
+        //Jugador no existe
         return false;
     }
 }
