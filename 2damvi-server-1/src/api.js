@@ -219,10 +219,16 @@ function searcher(data) {
     var ok = false;
     //Si lo encuentra es false sino true
     if (index != -1) {
-        ok = true;
+        ok = {
+             bool: true,
+             index: index
+            };
         //console.log("El jugador "+ data +" existe")
     }else{
-        ok = false;
+        ok = {
+            bool: false,
+            index: index
+           };;
         //console.log("El jugador "+ data +" no existe")
     }
     return ok;
@@ -230,10 +236,9 @@ function searcher(data) {
     //Comprueba si la contraseña esta bien (Usar para Api Rest)
 function login(paramAlias, paramPassword){
     ok = searcher(paramAlias);
-    if(ok === true){
-        var index = players.findIndex(j => j.alias === paramAlias);
-        if(paramPassword === players[index].password){
-            return players[index];
+    if(ok.bool === true){
+        if(paramPassword === players[ok.index].password){
+            return players[ok.index];
         }else{
             //Contraseña incorrecta
             return false;
@@ -244,8 +249,6 @@ function login(paramAlias, paramPassword){
         return false;
     }
 }
-
-
     //Comprueba que todos los campos son correctos
 function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramScore){
     getjson();
@@ -317,7 +320,6 @@ function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
     //COMPRAR MONEDAS
 function buyCoins(paramAlias){
     var index = players.findIndex(j => j.alias === paramAlias)
-        //Supongamos xk no tengo ni idea, que con 1 billetes se pilla 5 monedas. pos eso
         if(players[index].billetes < 1){
             response = codeErrorBuy403;
         }
@@ -338,7 +340,33 @@ function buyCoins(paramAlias){
         }
         return response;
 }
- 
+/// NUEVAS MONEDAS
+function newCoins(data){
+    if(data.alias === '' ||data.coins === ''){
+        return false;
+    }
+    else{
+        var ok = searcher(data.alias);
+        if(ok.bool){
+            if(players[ok.index].alias < 1){
+                response = codeError504;
+            }
+            else{
+                players[ok.index].coins += data.coins;
+                let jugadorjson = {
+                    alias: players[ok.index].alias,
+                    coins: players[ok.index].coins
+                }
+                response = jugadorjson;
+                savejson();
+                getjson();
+            }
+        }else{
+            response = false;
+        }
+        return response;
+    }
+}
 
 
 

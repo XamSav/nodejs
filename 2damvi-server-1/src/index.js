@@ -54,7 +54,7 @@ io.on('connection', (socket) =>{
   socket.on('player:playerupdate',(data)=>{
     var ok = apijs.searcher(data.alias);
     var hey = apijs.comprobadorDeDatos(data.alias, data.name, data.surname, data.score);
-    if(ok === true){
+    if(ok.bool === true){
       if(hey === true){
         apijs.updatePlayer(data.alias, data.name, data.surname, data.score);
         io.sockets.emit('server:playerupdate', data)
@@ -72,7 +72,7 @@ io.on('connection', (socket) =>{
     //Compra de Coins
   socket.on('player:buycoin',(data)=>{
     var ok = apijs.searcher(data);
-    if(ok === true){
+    if(ok.bool === true){
       var response = buyCoins(data);
       io.sockets.emit('server:buycoin', response)
     }else{
