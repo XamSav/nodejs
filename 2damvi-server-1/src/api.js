@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const app = express();
 var router = express.Router();
 const fs = require('fs'); 
-const { debug, error } = require("console");
 var jsonParser = bodyParser.json()
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 router.use(bodyParser.urlencoded({ extended: false }));
@@ -201,12 +200,12 @@ router.get('/login/:alias/:password', function(req,res){
     var ok = login(paramAlias, paramPassword);
     if(ok !== false){
         res.send(ok);
-    }else{
-        res.send("Error");
+    }else if(ok === "ErrorUsuario"){
+        res.send("ErrorUsuario");
+    }else if(ok === "ErrorContra"){
+        res.send("ErrorContra");
     }
 });
-
-
 
 ////////////////FUNCIONES/////////////////////
 
@@ -223,13 +222,10 @@ function searcher(data) {
              bool: true,
              index: index
             };
-        //console.log("El jugador "+ data +" existe")
+        console.log("El jugador "+ data +" existe y su index es el: "+index);
     }else{
-        ok = {
-            bool: false,
-            index: index
-           };;
-        //console.log("El jugador "+ data +" no existe")
+        ok = false;
+        console.log("El jugador "+ data +" no existe")
     }
     return ok;
 }
@@ -241,12 +237,12 @@ function login(paramAlias, paramPassword){
             return players[ok.index];
         }else{
             //Contraseña incorrecta
-            return false;
+            return "ErrorContra";
         }
     }
     else{
         //Jugador no existe
-        return false;
+        return "ErrorUsuario";
     }
 }
     //Comprueba que todos los campos son correctos
@@ -342,22 +338,18 @@ function buyCoins(paramAlias){
 }
 /// NUEVAS MONEDAS
 function newCoins(data){
-    if(data.alias === '' ||data.coins === ''){
+    if(data.alias === '' || data.coins === ''){
         return false;
     }
     else{
         var ok = searcher(data.alias);
-        if(ok.bool){
+        if(ok){
             if(players[ok.index].alias < 1){
                 response = codeError504;
             }
             else{
                 players[ok.index].coins += data.coins;
-                let jugadorjson = {
-                    alias: players[ok.index].alias,
-                    coins: players[ok.index].coins
-                }
-                response = jugadorjson;
+                response = players[ok.index].coins;
                 savejson();
                 getjson();
             }
@@ -367,8 +359,28 @@ function newCoins(data){
         return response;
     }
 }
-
-
+function newBillete(data){
+    if(data.alias === '' || data.billetes === ''){
+        return false;
+    }
+    else{
+        var ok = searcher(data.alias);
+        if(ok){
+            if(players[ok.index].alias < 1){
+                response = codeError504;
+            }
+            else{
+                players[ok.index].billetes += data.billetes;
+                response = players[ok.index].billetes;
+                savejson();
+                getjson();
+            }
+        }else{
+            response = false;
+        }
+        return response;
+    }
+}
 
 /*module.exports = {
     //app,
@@ -387,8 +399,12 @@ module.exports.enviarJugador = enviarJugador;
         //Todos
 module.exports.enviarJugadores = enviarJugadores;
     //Actualizar
-        //Cualquier cosa del jugador
+        //Todo del jugador
 module.exports.updatePlayer = updatePlayer;
         //Comprar Monedas
 module.exports.buyCoins = buyCoins;
+        //El Jugador consiguio Coins
+module.exports.newCoins = newCoins;
+        //El Jugador consiguio Billetes
+module.exports.newBillete = newBillete;
     //Eliminar

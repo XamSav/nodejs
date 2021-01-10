@@ -17,22 +17,20 @@ var { comprobadorDeDatos } = require('./api.js');
 var { enviarJugador } = require('./api.js');
 var { enviarJugadores } = require('./api.js');
 var { updatePlayers } = require('./api.js');
+var { newCoins } = require('./api.js');
 var { buyCoins } = require('./api.js');
 //Configuracion principal del Servidor
 const port = process.env.PORT || 4567;
 const server = app.listen(port, () => 
-    console.log("El servidor está inicializado en el puerto " + port
-));
+    console.log("El servidor está inicializado en el puerto " + port)
+    );
 
 //WebSockets
 const SocketIo = require('socket.io');
 const io = SocketIo(server);
 
 io.on('connection', (socket) =>{
-    console.log('Nueva conexion de', socket.id);
-    //Escuchar evento
-  ///PRUEBAS///
-  //Mirar 1 Jugador
+  console.log('Nueva conexion de', socket.id);
   socket.on('player:look',(data)=>{
     var player = apijs.enviarJugador(parseInt(data));
     if(player === false){
@@ -43,11 +41,11 @@ io.on('connection', (socket) =>{
     }
   });
   //Mirar Varios Jugadores
-  socket.on('players:look', () =>{
+  /*socket.on('players:look', () =>{
     var players = apijs.enviarJugadores();
     console.log(players)
     socket.emit('jugadores', players);
-  });
+  });*/
   ///CODIGO BUENO///
 
     //Actualizar un jugador
@@ -68,7 +66,24 @@ io.on('connection', (socket) =>{
       console.log("No hay ningun usuario con ese alias"); 
     }
   });
-
+  socket.on('player:collectcoin', (data) =>{
+    var ok = apijs.searcher(data.alias);
+    if(ok === true){
+    var hey = newCoins(data.alias, data.coin);
+      if(hey > 0){
+        socket.emit('server:coincollected', hey);
+      }
+    }
+  });
+  socket.on('player:collectbilletes', (data) =>{
+    var ok = apijs.searcher(data.alias);
+    if(ok === true){
+    var hey = newCoins(data.alias, data.billetes);
+      if(hey > 0){
+        socket.emit('server:billetescollected', hey);
+      }
+    }
+  });
     //Compra de Coins
   socket.on('player:buycoin',(data)=>{
     var ok = apijs.searcher(data);
@@ -84,12 +99,8 @@ io.on('connection', (socket) =>{
     //Emitir a todos los usuarios
     io.sockets.emit('server:powerup', data)
   });
-
-    /*
-  socket.on('player:onlyadata', (data) =>{
     //Emitir a todos menos al cliente en cuestion.
-    socket.broadcast.emit('server:onlyadata')
-  })*/
+    //socket.broadcast.emit('server:onlyadata');
 });
 
 //Uso de ApiJS
