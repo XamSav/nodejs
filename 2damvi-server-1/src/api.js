@@ -93,14 +93,14 @@ router.post('/players/:alias', jsonParser   ,function (req, res) {
     var paramSurname = req.body.surname || '';
     var paramPassword = req.body.password || '';
     if (paramAlias === '' || paramName === '' || paramSurname === '' || paramPassword === '') {
-        response = codeError502;
+        response = "ErrorFalta";
     } else {
         //Player Search
         var index = players.findIndex(j => j.alias === paramAlias)
 
         if (index != -1) {
             //Player allready exists
-            response = codeError503;
+            response = "ErrorExiste";
         } else {
             //Add Player
             players.push({ 
