@@ -381,7 +381,26 @@ function newBillete(data){
         return response;
     }
 }
-
+function updatePower(data){
+    if(data.habilidad1 === '' && data.habilidad2 === ''){
+        response = false;
+    }else if(data.habilidad1 !== '' && data.habilidad2 === ''){
+        getjson();
+        var ok = searcher(data.alias);
+        players[ok.index].habilidad1 + 1;
+        response = players[ok.index].habilidad1;
+        savejson();
+        getjson();
+    }else if(data.habilidad2 !== '' && data.habilidad1 === ''){
+        getjson();
+        var ok = searcher(data.alias);
+        players[ok.index].habilidad2 + 1;
+        response = players[ok.index].habilidad2;
+        savejson();
+        getjson();
+    }
+    return response;
+}
 /*module.exports = {
     //app,
     searcher,
@@ -407,4 +426,6 @@ module.exports.buyCoins = buyCoins;
 module.exports.newCoins = newCoins;
         //El Jugador consiguio Billetes
 module.exports.newBillete = newBillete;
+        //Aumentar habilidad
+module.exports.updatePower = updatePower;
     //Eliminar

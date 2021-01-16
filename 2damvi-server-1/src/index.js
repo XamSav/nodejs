@@ -18,6 +18,7 @@ var { enviarJugador } = require('./api.js');
 var { enviarJugadores } = require('./api.js');
 var { updatePlayers } = require('./api.js');
 var { newCoins } = require('./api.js');
+var { updatePower } = require('./api.js');
 var { buyCoins } = require('./api.js');
 //Configuracion principal del Servidor
 const port = process.env.PORT || 4567;
@@ -31,6 +32,7 @@ const io = SocketIo(server);
 
 io.on('connection', (socket) =>{
   console.log('Nueva conexion de', socket.id);
+  
   socket.on('player:look',(data)=>{
     var player = apijs.enviarJugador(parseInt(data));
     if(player === false){
@@ -55,14 +57,14 @@ io.on('connection', (socket) =>{
     if(ok.bool === true){
       if(hey === true){
         apijs.updatePlayer(data.alias, data.name, data.surname, data.score);
-        io.sockets.emit('server:playerupdate', data)
+        io.socket.emit('server:playerupdate', data)
       }else{
-        io.sockets.emit('error', "Uno de los parametros es erróneo");
+        io.socket.emit('error', "Uno de los parametros es erróneo");
         console.log("Uno de los parametros es erróneo");
       }    
     }    
     else{
-      io.sockets.emit('error',"No hay ningun usuario con ese alias");
+      io.socket.emit('error',"No hay ningun usuario con ese alias");
       console.log("No hay ningun usuario con ese alias"); 
     }
   });
@@ -89,15 +91,19 @@ io.on('connection', (socket) =>{
     var ok = apijs.searcher(data);
     if(ok.bool === true){
       var response = buyCoins(data);
-      io.sockets.emit('server:buycoin', response)
+      io.socket.emit('server:buycoin', response)
     }else{
-      io.sockets.emit('error', "No existe ese usuario")
+      io.socket.emit('error', "No existe ese usuario")
     }
   });
   //Aumentar de Habilidad
   socket.on('player:powerup',(data)=>{
-    //Emitir a todos los usuarios
-    io.sockets.emit('server:powerup', data)
+    var ok = updatePower(data);
+    if(!ok){
+      io.socket.emit('server:error', "No se pudo mejorar la habilidad")
+    }else{
+      io.socket.emit('server:powerup', data)
+    }
   });
     //Emitir a todos menos al cliente en cuestion.
     //socket.broadcast.emit('server:onlyadata');
