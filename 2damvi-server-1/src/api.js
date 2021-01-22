@@ -161,7 +161,7 @@ router.delete('/players/:alias', function(req,res){
             UpdateRanking();
         }
         else {
-            response = codeError504;
+            response = "ErrorExiste";
         }
     }
     res.send(response);
