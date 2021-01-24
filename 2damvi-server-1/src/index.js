@@ -2,6 +2,7 @@
 const path = require('path');
 const express = require("express");
 var app = express()
+app.disable('x-powered-by');
 const bodyParser = require("body-parser");
 
 //Swagger
@@ -12,11 +13,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //ApiJS para WebSocket
 var apijs = require('./api.js');
 var { searcher } = require('./api.js');
-var { comprobadorDeDatos } = require('./api.js');
-//var { comprobarcontra } = require('./api.js');
-var { enviarJugador } = require('./api.js');
-var { enviarJugadores } = require('./api.js');
-var { updatePlayers } = require('./api.js');
 var { newCoins } = require('./api.js');
 var { updatePower } = require('./api.js');
 var { buyCoins } = require('./api.js');
@@ -57,15 +53,13 @@ io.on('connection', (socket) =>{
     if(ok.bool === true){
       if(hey === true){
         apijs.updatePlayer(data.alias, data.name, data.surname, data.score);
-        io.socket.emit('server:playerupdate', data)
+        io.socket.emit('server:playerupdate', data);
       }else{
         io.socket.emit('error', "Uno de los parametros es erróneo");
-        console.log("Uno de los parametros es erróneo");
       }    
     }    
     else{
       io.socket.emit('error',"No hay ningun usuario con ese alias");
-      console.log("No hay ningun usuario con ese alias"); 
     }
   });
   socket.on('player:collectcoin', (data) =>{
@@ -97,12 +91,38 @@ io.on('connection', (socket) =>{
     }
   });
   //Aumentar de Habilidad
-  socket.on('player:powerup',(data)=>{
+  socket.on('player:buyHability1',(data)=>{
+    data = {
+        alias: data,
+        habilidad1: true,
+        habilidad2: false
+    };
+    var ok = updatePower(data);
+    if(ok.error){
+      socket.emit('server:error', "No se pudo mejorar la habilidad")
+    }else{
+      socket.emit('server:buyHability', data.alias);
+    }
+  });
+  socket.on('player:buyHability2',(data)=>{
+    data = {
+        alias: data,
+        habilidad1: false,
+        habilidad2: true
+    };
+    var ok = updatePower(data);
+    if(ok.error){
+      socket.emit('server:error', "No se pudo mejorar la habilidad")
+    }else{
+      socket.emit('server:buyHability', data.alias);
+    }
+  });
+  socket.on('player:newscore', (data)=>{
     var ok = updatePower(data);
     if(!ok){
-      io.socket.emit('server:error', "No se pudo mejorar la habilidad")
+      socket.emit('server:error', "Error al agregar la puntuacion");
     }else{
-      io.socket.emit('server:powerup', data)
+      socket.emit('server:newscore');
     }
   });
     //Emitir a todos menos al cliente en cuestion.

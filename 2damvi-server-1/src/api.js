@@ -14,7 +14,6 @@ let code202 = { code: 202, error: false, message: 'Player Correctly Updated' };
 let code203 = { code: 203, error: false, message: 'Player Correctly Deleted' };
 let codeError502 = { code: 502, error: true, message: 'The field: name, surname, score are mandatories (the score value has to be >0)' };
 let codeError503 = { code: 503, error: true, message: 'Error: Player Exists' };
-let codeError504 = { code: 504, error: true, message: 'Error: Player not found' };
 //Mensajes de compras
 let codeBuy401 = { code: 401, error: false, message: 'Purchase made' };
 let codeErrorBuy402 = { code: 402, error: true, message: 'Error: Please specify the alias or the number of billetes to buy'};
@@ -26,8 +25,8 @@ var CatalogoHabilidades = [
     {nombre: "Flash", id: 2 }
 ];
 var players = [
-    { position: "1", alias: "jperez", password:"a9993e364706816aba3e25717850c26c9cd0d89d", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0},
-    { position: "2", alias: "jsanz", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 },
+    { position: "1", alias: "jperez", password:"a9993e364706816aba3e25717850c26c9cd0d89d", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 10, billetes: 0, habilidad1: 0, habilidad2: 1},
+    { position: "2", alias: "jsanz", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 1, habilidad2: 0 },
     { position: "3", alias: "mgutierrez", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 }
 ];
 let response = {
@@ -51,7 +50,6 @@ function getjson(){
         players = JSON.parse(jsonString);
     })
 }
-
 getjson();
 function UpdateRanking() {
     //Order the ranking
@@ -64,6 +62,7 @@ function UpdateRanking() {
     getjson();
 };
 
+//Get
 router.get('/', function (req, res) {
     //code funciona ok
     res.send(code100);
@@ -87,86 +86,18 @@ router.get('/players/:alias', function (req, res) {
     }
     res.send(response);
 });
-router.post('/players/:alias', jsonParser   ,function (req, res) {
+router.get('/login/:alias/:password', function(req,res){
     var paramAlias = req.params.alias || '';
-    var paramName = req.body.name || '';
-    var paramSurname = req.body.surname || '';
-    var paramPassword = req.body.password || '';
-    if (paramAlias === '' || paramName === '' || paramSurname === '' || paramPassword === '') {
-        response = "ErrorFalta";
-    } else {
-        //Player Search
-        var index = players.findIndex(j => j.alias === paramAlias)
-
-        if (index != -1) {
-            //Player allready exists
-            response = "ErrorExiste";
-        } else {
-            //Add Player
-            players.push({ 
-                position: '', 
-                alias: paramAlias, 
-                name: paramName, 
-                surname: paramSurname,
-                password: paramPassword, 
-                score: 0,
-                created: new Date(),
-                coins: 10,
-                billetes: 5,
-                habilidad1: 0,
-                habilidad2: 0
-            });
-            //Sort the ranking
-            UpdateRanking();
-            //Search Player Again
-            index = players.findIndex(j => j.alias === paramAlias);
-            //Response return
-            response = code201;
-            response.player = players[index];
-        }
+    var paramPassword = req.params.password || '';
+    var ok = login(paramAlias, paramPassword);
+    if(ok !== false){
+        res.send(ok);
+    }else if(ok === "ErrorUsuario"){
+        res.send("ErrorUsuario");
+    }else if(ok === "ErrorContra"){
+        res.send("ErrorContra");
     }
-    res.send(response);
-
 });
-router.put('/players/:alias',jsonParser, function (req, res) {
-    var paramAlias = req.params.alias || '';
-    var paramName = req.body.name || '';
-    var paramSurname = req.body.surname || '';
-    var paramScore = req.body.score || '';
-
-    if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '') {
-        response = codeError502; //Paràmetres incomplerts
-    } else {
-        response = updatePlayer(paramAlias, paramName, paramSurname, paramScore);
-    }
-    res.send(response);
-});
-
-//Borrar jugador by https://www.codegrepper.com/code-examples/c/delete+array+item+by+id+using+app.delete
-router.delete('/players/:alias', function(req,res){
-    var paramAlias = req.params.alias || '';
-    if (paramAlias === '') {
-        response = codeError502; //Paràmetres incomplerts
-    } 
-    else{
-        getjson();
-        //Player Search
-        var index = players.findIndex(j => j.alias === paramAlias);
-        var playerIndex = players.indexOf("Jugador");
-        if (index != -1) {
-            console.log("The player "+ paramAlias+" has ben deleted");
-            response = code203;
-            players.splice(index, 1);
-            //Sort the ranking
-            UpdateRanking();
-        }
-        else {
-            response = codeError504;
-        }
-    }
-    res.send(response);
-});
-
 //Comprar monedas con billetes
 router.get('/buycoins/:alias', function(req,res){
     var paramAlias = req.params.alias || '';
@@ -193,18 +124,91 @@ router.get('/buycoins/:alias', function(req,res){
     }
     res.send(response);
 });
-
-router.get('/login/:alias/:password', function(req,res){
+//Post
+router.post('/players/:alias', jsonParser   ,function (req, res) {
     var paramAlias = req.params.alias || '';
-    var paramPassword = req.params.password || '';
-    var ok = login(paramAlias, paramPassword);
-    if(ok !== false){
-        res.send(ok);
-    }else if(ok === "ErrorUsuario"){
-        res.send("ErrorUsuario");
-    }else if(ok === "ErrorContra"){
-        res.send("ErrorContra");
+    var paramName = req.body.name || '';
+    var paramSurname = req.body.surname || '';
+    var paramPassword = req.body.password || '';
+    var ok = comprobadorDeDatos(paramAlias, paramName, paramSurname, paramPassword);
+    if (ok === false) {
+        response = "ErrorFalta";
+    } else {
+        //Player Search
+        var index = searcher(paramAlias);
+
+        if (index.thebool === true) {
+            //Player allready exists
+            response = "ErrorExiste";
+            console.log("Existe");
+        } else {
+            console.log("No Existe");
+            //Add Player
+            players.push({ 
+                position: '', 
+                alias: paramAlias, 
+                name: paramName, 
+                surname: paramSurname,
+                password: paramPassword, 
+                score: 0,
+                created: new Date(),
+                coins: 10,
+                billetes: 5,
+                habilidad1: 0,
+                habilidad2: 0
+            });
+            //Sort the ranking
+            UpdateRanking();
+            //Search Player Again
+            index = searcher(paramAlias);
+            //Response return
+            response = code201;
+            response.player = players[index.theindex];
+        }
     }
+    res.send(response);
+
+});
+//Put
+router.put('/players/:alias',jsonParser, function (req, res) {
+    var paramAlias = req.params.alias || '';
+    var paramName = req.body.name || '';
+    var paramSurname = req.body.surname || '';
+    var paramScore = req.body.score || '';
+
+    if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '') {
+        response = codeError502; //Paràmetres incomplerts
+    } else {
+        response = updatePlayer(paramAlias, paramName, paramSurname, paramScore);
+    }
+    res.send(response);
+});
+
+//Delete
+//Borrar jugador by https://www.codegrepper.com/code-examples/c/delete+array+item+by+id+using+app.delete
+router.delete('/players/:alias', function(req,res){
+    var paramAlias = req.params.alias || '';
+    if (paramAlias === '') {
+        response = codeError502; //Paràmetres incomplerts
+    } 
+    else{
+        getjson();
+        //Player Search
+        var index = players.findIndex(j => j.alias === paramAlias);
+        var playerIndex = players.indexOf("Jugador");
+        if (index != -1) {
+            console.log("The player "+ paramAlias+" has ben deleted");
+            response = "El jugador "+ paramAlias+ " ha sido eliminado";
+            players.splice(index, 1);
+            //Sort the ranking
+            UpdateRanking();
+        }
+        else {
+            console.log("Error Inexistente");
+            response = "ErrorInexistente";
+        }
+    }
+    res.send(response);
 });
 
 ////////////////FUNCIONES/////////////////////
@@ -218,23 +222,18 @@ function searcher(data) {
     var ok = false;
     //Si lo encuentra es false sino true
     if (index != -1) {
-        ok = {
-             bool: true,
-             index: index
-            };
-        console.log("El jugador "+ data +" existe y su index es el: "+index);
+        ok = {thebool: true, theindex: index};
     }else{
-        ok = false;
-        console.log("El jugador "+ data +" no existe")
+        ok = {thebool: false, theindex: index};
     }
     return ok;
 }
     //Comprueba si la contraseña esta bien (Usar para Api Rest)
 function login(paramAlias, paramPassword){
     ok = searcher(paramAlias);
-    if(ok.bool === true){
-        if(paramPassword === players[ok.index].password){
-            return players[ok.index];
+    if(ok.thebool === true){
+        if(paramPassword === players[ok.theindex].password){
+            return players[ok.theindex];
         }else{
             //Contraseña incorrecta
             return "ErrorContra";
@@ -246,10 +245,10 @@ function login(paramAlias, paramPassword){
     }
 }
     //Comprueba que todos los campos son correctos
-function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramScore){
+function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramPassword/*paramScore*/){
     getjson();
     var hey = false;
-    if (paramAlias === '' || paramName === '' || paramSurname === '' || parseInt(paramScore) <= 0 || paramScore === '' || isNaN(paramScore) || paramScore === null){
+    if (paramAlias === '' || paramName === '' || paramSurname === '' || paramPassword === ''){/*parseInt(paramScore) <= 0 || paramScore === '' || isNaN(paramScore) || paramScore === null*/
         hey = false;
     }else{
         hey = true;
@@ -261,20 +260,20 @@ function comprobadorDeDatos(paramAlias, paramName, paramSurname, paramScore){
 /////ACCIONES/////
     //OBTENER
         //SOLO 1 JUGADOR
-    function enviarJugador(data){
-        getjson();
-        if(data < 0 || data > players.length){
-            data = false;
-            return data;
-        }else{
-        return players[data];
-        }
+function enviarJugador(data){
+    getjson();
+    if(data < 0 || data > players.length){
+        data = false;
+        return data;
+    }else{
+    return players[data];
     }
-        //TODOS LOS JUGADORES
-    function enviarJugadores(){
-        getjson();
-        return players;
-    }
+}
+    //TODOS LOS JUGADORES
+function enviarJugadores(){
+    getjson();
+    return players;
+}
     //EDITAR
         //Actualizar cualquier cosa del jugador
 function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
@@ -343,16 +342,11 @@ function newCoins(data){
     }
     else{
         var ok = searcher(data.alias);
-        if(ok){
-            if(players[ok.index].alias < 1){
-                response = codeError504;
-            }
-            else{
-                players[ok.index].coins += data.coins;
-                response = players[ok.index].coins;
-                savejson();
-                getjson();
-            }
+        if(ok.thebool){
+            players[ok.theindex].coins += data.coins;
+            response = players[ok.theindex].coins;
+            savejson();
+            getjson();
         }else{
             response = false;
         }
@@ -381,31 +375,51 @@ function newBillete(data){
         return response;
     }
 }
+/// COMPRAR HABILIDAD
 function updatePower(data){
-    if(data.habilidad1 === '' && data.habilidad2 === ''){
-        response = false;
-    }else if(data.habilidad1 !== '' && data.habilidad2 === ''){
+
+    if(data.habilidad1 && !data.habilidad2){
         getjson();
         var ok = searcher(data.alias);
-        players[ok.index].habilidad1 + 1;
-        response = players[ok.index].habilidad1;
-        savejson();
-        getjson();
-    }else if(data.habilidad2 !== '' && data.habilidad1 === ''){
+        if(players[ok.theindex].habilidad1 < 2 && players[ok.theindex].coins >= 5){
+            players[ok.theindex].habilidad1++;
+            response = players[ok.theindex].habilidad1
+            savejson();
+            getjson();
+        }else{
+            response = {
+                message: "Error",
+                error: true
+            };
+        }
+    }else if(data.habilidad2 && !data.habilidad1){
         getjson();
         var ok = searcher(data.alias);
-        players[ok.index].habilidad2 + 1;
-        response = players[ok.index].habilidad2;
-        savejson();
-        getjson();
+        if(players[ok.theindex].habilidad1 < 2 && players[ok.theindex].coins >= 5){
+            players[ok.theindex].habilidad2 + 1;
+            response = { 
+                player: players[ok.theindex].habilidad2,
+                error: false
+            };
+            savejson();
+            getjson();
+        }else{
+            response = {
+                message: "Error",
+                error: true
+            };
+        }
     }
     return response;
 }
-/*module.exports = {
-    //app,
-    searcher,
-    router
-}*/
+    
+
+function updateScore(data){
+    var ok = searcher(data);
+    if(!ok.theindex){
+        players[ok.theindex]
+    }
+}
 module.exports = router;
 ///Comprobantes
 module.exports.searcher = searcher;
@@ -428,4 +442,4 @@ module.exports.newCoins = newCoins;
 module.exports.newBillete = newBillete;
         //Aumentar habilidad
 module.exports.updatePower = updatePower;
-    //Eliminar
+module.exports.updateScore = updateScore;
