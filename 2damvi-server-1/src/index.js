@@ -16,6 +16,8 @@ var { searcher } = require('./api.js');
 var { newCoins } = require('./api.js');
 var { updatePower } = require('./api.js');
 var { buyCoins } = require('./api.js');
+var { topJugadores } = require('./api.js');
+var { updateScore } = require('./api.js');
 //Configuracion principal del Servidor
 const port = process.env.PORT || 4567;
 const server = app.listen(port, () => 
@@ -38,14 +40,6 @@ io.on('connection', (socket) =>{
       socket.emit('jugador', player);
     }
   });
-  //Mirar Varios Jugadores
-  /*socket.on('players:look', () =>{
-    var players = apijs.enviarJugadores();
-    console.log(players)
-    socket.emit('jugadores', players);
-  });*/
-  ///CODIGO BUENO///
-
     //Actualizar un jugador
   socket.on('player:playerupdate',(data)=>{
     var ok = apijs.searcher(data.alias);
@@ -53,13 +47,13 @@ io.on('connection', (socket) =>{
     if(ok.bool === true){
       if(hey === true){
         apijs.updatePlayer(data.alias, data.name, data.surname, data.score);
-        io.socket.emit('server:playerupdate', data);
+        socket.emit('server:playerupdate', data);
       }else{
-        io.socket.emit('error', "Uno de los parametros es erróneo");
+        socket.emit('error', "Uno de los parametros es erróneo");
       }    
     }    
     else{
-      io.socket.emit('error',"No hay ningun usuario con ese alias");
+      socket.emit('error',"No hay ningun usuario con ese alias");
     }
   });
   socket.on('player:collectcoin', (data) =>{
@@ -85,9 +79,9 @@ io.on('connection', (socket) =>{
     var ok = apijs.searcher(data);
     if(ok.bool === true){
       var response = buyCoins(data);
-      io.socket.emit('server:buycoin', response)
+      socket.emit('server:buycoin', response)
     }else{
-      io.socket.emit('error', "No existe ese usuario")
+      socket.emit('error', "No existe ese usuario")
     }
   });
   //Aumentar de Habilidad
@@ -117,16 +111,31 @@ io.on('connection', (socket) =>{
       socket.emit('server:buyHability', data.alias);
     }
   });
+  //Nuevo Score
   socket.on('player:newscore', (data)=>{
-    var ok = updatePower(data);
-    if(!ok){
-      socket.emit('server:error', "Error al agregar la puntuacion");
-    }else{
-      socket.emit('server:newscore');
+      var ok = updateScore(data);
+      if(!ok){
+        socket.emit('server:error', "Error al agregar la puntuacion");
+      }else{
+        var lostop = topJugadores(0);
+        io.emit('server:ranking1', lostop);
+        var lostop = topJugadores(1);
+        io.emit('server:ranking2', lostop);
+        var lostop = topJugadores(2);
+        io.emit('server:ranking3', lostop);
+        var lostop = topJugadores(3);
+        io.emit('server:ranking4', lostop);
+        var lostop = topJugadores(4);
+        io.emit('server:ranking5', lostop);
+        socket.emit('server:newscore', ok);
     }
+    
   });
     //Emitir a todos menos al cliente en cuestion.
     //socket.broadcast.emit('server:onlyadata');
+  socket.on('disconnect', () =>{
+    console.log("Se fue: ", socket.id);
+  })
 });
 
 //Uso de ApiJS

@@ -18,12 +18,7 @@ let codeError503 = { code: 503, error: true, message: 'Error: Player Exists' };
 let codeBuy401 = { code: 401, error: false, message: 'Purchase made' };
 let codeErrorBuy402 = { code: 402, error: true, message: 'Error: Please specify the alias or the number of billetes to buy'};
 let codeErrorBuy403 = { code: 403, error: true, message: "Error: You don't have enough points"};
-//Errores Login
-let codeLogin501 = {code: 501, error: true, message: 'Contraseña Incorrecta'};
-var CatalogoHabilidades = [
-    {nombre: "Bola de fuego", id: 1},
-    {nombre: "Flash", id: 2 }
-];
+
 var players = [
     { position: "1", alias: "jperez", password:"a9993e364706816aba3e25717850c26c9cd0d89d", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 10, billetes: 0, habilidad1: 0, habilidad2: 1},
     { position: "2", alias: "jsanz", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 1, habilidad2: 0 },
@@ -46,8 +41,9 @@ function getjson(){
         if (err) {
             console.log("File read failed:", err)
             return
+        }else{
+            players = JSON.parse(jsonString);
         }
-        players = JSON.parse(jsonString);
     })
 }
 getjson();
@@ -67,6 +63,7 @@ router.get('/', function (req, res) {
     //code funciona ok
     res.send(code100);
 });
+//Muestra todos los usuarios.
 router.get('/ranking', function (req, res) {
     UpdateRanking();
     let ranking = { namebreplayers: players.length, players: players };
@@ -274,6 +271,12 @@ function enviarJugadores(){
     getjson();
     return players;
 }
+    //Top 10 Jugadores
+function topJugadores(i){
+    getjson();
+    response = players[i];
+    return response;
+}
     //EDITAR
         //Actualizar cualquier cosa del jugador
 function updatePlayer(paramAlias, paramName, paramSurname, paramScore){
@@ -412,13 +415,19 @@ function updatePower(data){
     }
     return response;
 }
-    
-
 function updateScore(data){
+    getjson();
     var ok = searcher(data);
-    if(!ok.theindex){
-        players[ok.theindex]
+    if(ok.thebool){
+        players[ok.theindex].score += 5;
+        savejson();
+        response = players[ok.theindex];
     }
+    else{
+        response = "error";
+    }
+    //savejson();
+    return response;
 }
 module.exports = router;
 ///Comprobantes
@@ -431,6 +440,8 @@ module.exports.comprobadorDeDatos = comprobadorDeDatos;
 module.exports.enviarJugador = enviarJugador;
         //Todos
 module.exports.enviarJugadores = enviarJugadores;
+        //Top 10
+module.exports.topJugadores = topJugadores;
     //Actualizar
         //Todo del jugador
 module.exports.updatePlayer = updatePlayer;
