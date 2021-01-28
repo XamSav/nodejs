@@ -422,6 +422,7 @@ function updateScore(data){
         players[ok.theindex].score += 5;
         savejson();
         response = players[ok.theindex];
+        UpdateRanking();
     }
     else{
         response = "error";
