@@ -26,6 +26,7 @@ const server = app.listen(port, () =>
 
 //WebSockets
 const SocketIo = require('socket.io');
+const { debug } = require('console');
 const io = SocketIo(server);
 
 io.on('connection', (socket) =>{
@@ -122,23 +123,28 @@ io.on('connection', (socket) =>{
   });
   //Nuevo Score
   socket.on('player:newscore', (data)=>{
+    console.log(data)
       var ok = updateScore(data);
       if(!ok){
         socket.emit('server:error', "Error al agregar la puntuacion");
       }else{
-        var lostop = topJugadores(0);
-        io.emit('server:ranking1', lostop);
-        var lostop1 = topJugadores(1);
-        io.emit('server:ranking2', lostop1);
-        var lostop2 = topJugadores(2);
-        io.emit('server:ranking3', lostop2);
-        var lostop3 = topJugadores(3);
-        io.emit('server:ranking4', lostop3);
-        var lostop4 = topJugadores(4);
-        io.emit('server:ranking5', lostop4);
+        var lostop = topJugadores();
+        io.emit('server:ranking', lostop[0]);
+        io.emit('server:ranking1', lostop[1]);
+        io.emit('server:ranking2', lostop[2]);
+        io.emit('server:ranking3', lostop[3]);
+        io.emit('server:ranking4', lostop[4]);
+        
         socket.emit('server:newscore', ok);
     }
-    
+  });
+  socket.on('player:ranking', ()=>{
+    var lostop = topJugadores();
+        io.emit('server:ranking', lostop[0]);
+        io.emit('server:ranking1', lostop[1]);
+        io.emit('server:ranking2', lostop[2]);
+        io.emit('server:ranking3', lostop[3]);
+        io.emit('server:ranking4', lostop[4]);
   });
     //Emitir a todos menos al cliente en cuestion.
     //socket.broadcast.emit('server:onlyadata');

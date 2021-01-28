@@ -29,6 +29,7 @@ let response = {
     code: 200,
     message: ''
 };
+var jsonString;
 function savejson(){
     const str = JSON.stringify(players);
     fs.writeFile('./src/player.json', str,'utf8', (err) => { 
@@ -272,9 +273,24 @@ function enviarJugadores(){
     return players;
 }
     //Top 10 Jugadores
-function topJugadores(i){
+function topJugadores(){
     getjson();
-    response = players[i];
+    toplayers = [];
+    var max = 0;
+    if(players.length < 5){
+        max = players.length;
+    }else{
+        max = 5;
+    }
+    for(i = 0; i < max ; i++){
+        toplayers.push({
+            alias: players[i].alias,
+            score: players[i].score,
+            coins: players[i].coins,
+            billetes: players[i].billetes
+        });
+    }
+    response = toplayers;
     return response;
 }
     //EDITAR
@@ -417,12 +433,11 @@ function updatePower(data){
 }
 function updateScore(data){
     //getjson();
-    var ok = searcher(data);
+    var ok = searcher(data.alias);
     if(ok.thebool){
-        players[ok.theindex].score += 5;
-        savejson();
+        players[ok.theindex].score = parseInt(data.score);
         response = players[ok.theindex];
-        //UpdateRanking();
+        UpdateRanking();
     }
     else{
         response = "error";
