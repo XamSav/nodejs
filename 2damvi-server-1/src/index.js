@@ -119,14 +119,14 @@ io.on('connection', (socket) =>{
       }else{
         var lostop = topJugadores(0);
         io.emit('server:ranking1', lostop);
-        var lostop = topJugadores(1);
-        io.emit('server:ranking2', lostop);
-        var lostop = topJugadores(2);
-        io.emit('server:ranking3', lostop);
-        var lostop = topJugadores(3);
-        io.emit('server:ranking4', lostop);
-        var lostop = topJugadores(4);
-        io.emit('server:ranking5', lostop);
+        var lostop1 = topJugadores(1);
+        io.emit('server:ranking2', lostop1);
+        var lostop2 = topJugadores(2);
+        io.emit('server:ranking3', lostop2);
+        var lostop3 = topJugadores(3);
+        io.emit('server:ranking4', lostop3);
+        var lostop4 = topJugadores(4);
+        io.emit('server:ranking5', lostop4);
         socket.emit('server:newscore', ok);
     }
     
