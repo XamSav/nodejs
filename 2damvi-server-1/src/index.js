@@ -40,7 +40,6 @@ io.on('connection', (socket) =>{
   io.emit('server:ranking4', lostop3);
   var lostop4 = topJugadores(4);
   io.emit('server:ranking5', lostop4);
-  socket.emit('server:newscore', ok);
   socket.on('player:look',(data)=>{
     var player = apijs.enviarJugador(parseInt(data));
     if(player === false){
