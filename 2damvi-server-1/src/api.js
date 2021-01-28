@@ -416,13 +416,13 @@ function updatePower(data){
     return response;
 }
 function updateScore(data){
-    getjson();
+    //getjson();
     var ok = searcher(data);
     if(ok.thebool){
         players[ok.theindex].score += 5;
         savejson();
         response = players[ok.theindex];
-        UpdateRanking();
+        //UpdateRanking();
     }
     else{
         response = "error";
