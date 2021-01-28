@@ -30,7 +30,7 @@ const io = SocketIo(server);
 
 io.on('connection', (socket) =>{
   console.log('Nueva conexion de', socket.id);
-  var lostop = topJugadores(0);
+  /*var lostop = topJugadores(0);
   io.emit('server:ranking1', lostop);
   var lostop1 = topJugadores(1);
   io.emit('server:ranking2', lostop1);
@@ -39,7 +39,7 @@ io.on('connection', (socket) =>{
   var lostop3 = topJugadores(3);
   io.emit('server:ranking4', lostop3);
   var lostop4 = topJugadores(4);
-  io.emit('server:ranking5', lostop4);
+  io.emit('server:ranking5', lostop4);*/
   socket.on('player:look',(data)=>{
     var player = apijs.enviarJugador(parseInt(data));
     if(player === false){
