@@ -29,24 +29,34 @@ let response = {
     code: 200,
     message: ''
 };
-
+/*
 function savejson(){
     const str = JSON.stringify(players);
-    fs.writeFile('./src/player.json', str,'utf8', (err) => { 
-        if (err) throw err; 
+    fs.writeFileSync('./src/player.json', str,'utf8', (err) => { 
+        if (err){ console.log("hey");throw err} 
         console.log('The file has been saved!'); 
     });
+}*/
+function savejson(){
+    const str = JSON.stringify(players);
+    const data = fs.writeFileSync('./src/player.json', str,'utf8');
 }
 function getjson(){
-    fs.readFile('./src/player.json', 'utf8', (err, jsonString) => {
+    const data = fs.readFileSync("./src/player.json", "utf8");
+    players = JSON.parse(data);
+}
+/*
+function getjson(){
+    fs.readFileSync('./src/player.json', 'utf8', (err, jsonString) => {
         if (err) {
             console.log("File read failed:", err)
             return
         }else{
+            console.log("Hey");
             players = JSON.parse(jsonString);
         }
     })
-}
+}*/
 getjson();
 function UpdateRanking() {
     //Order the ranking
@@ -135,7 +145,7 @@ router.post('/players/:alias', jsonParser   ,function (req, res) {
         //Player Search
         var index = searcher(paramAlias);
 
-        if (index.thebool === true) {
+        if (index.theindex != -1) {
             //Player allready exists
             response = "ErrorExiste";
             console.log("Existe");
