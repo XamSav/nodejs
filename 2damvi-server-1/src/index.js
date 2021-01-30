@@ -95,30 +95,13 @@ io.on('connection', (socket) =>{
     }
   });
   //Aumentar de Habilidad
-  socket.on('player:buyHability1',(data)=>{
-    data = {
-        alias: data,
-        habilidad1: true,
-        habilidad2: false
-    };
+  socket.on('player:buyHability',(data)=>{
     var ok = updatePower(data);
     if(ok.error){
       socket.emit('server:error', "No se pudo mejorar la habilidad")
     }else{
-      socket.emit('server:buyHability', data.alias);
-    }
-  });
-  socket.on('player:buyHability2',(data)=>{
-    data = {
-        alias: data,
-        habilidad1: false,
-        habilidad2: true
-    };
-    var ok = updatePower(data);
-    if(ok.error){
-      socket.emit('server:error', "No se pudo mejorar la habilidad")
-    }else{
-      socket.emit('server:buyHability', data.alias);
+      var respuesta = { habilidad: data.habilidad, nivel: ok};
+      socket.emit('server:buyHability', respuesta);
     }
   });
   //Nuevo Score

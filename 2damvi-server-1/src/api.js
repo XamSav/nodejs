@@ -29,7 +29,7 @@ let response = {
     code: 200,
     message: ''
 };
-var jsonString;
+
 function savejson(){
     const str = JSON.stringify(players);
     fs.writeFile('./src/player.json', str,'utf8', (err) => { 
@@ -397,36 +397,49 @@ function newBillete(data){
 /// COMPRAR HABILIDAD
 function updatePower(data){
 
-    if(data.habilidad1 && !data.habilidad2){
-        getjson();
-        var ok = searcher(data.alias);
-        if(players[ok.theindex].habilidad1 < 2 && players[ok.theindex].coins >= 5){
-            players[ok.theindex].habilidad1++;
-            response = players[ok.theindex].habilidad1
-            savejson();
-            getjson();
-        }else{
-            response = {
-                message: "Error",
-                error: true
-            };
+    getjson();
+    var ok = searcher(data.alias);
+    if(ok.thebool){
+        if(parseInt(data.habilidad) == 1){
+            if(players[ok.theindex].habilidad1 < 2 && players[ok.theindex].coins >= data.precio){
+                players[ok.theindex].habilidad1++;
+                players[ok.theindex].coins -= data.precio;
+                response = players[ok.theindex].habilidad1;
+                savejson();
+                getjson();
+                console.log("Hey")
+            }
+            else{
+                response = {
+                    message: "Error",
+                    error: true
+                }
+            }
+        }else if(parseInt(data.habilidad) == 2){
+            if(players[ok.theindex].habilidad2 < 2 && players[ok.theindex].coins >= data.precio){
+                players[ok.theindex].habilidad2++;
+                players[ok.theindex].coins -= data.precio;
+                response = players[ok.theindex].habilidad2;
+                savejson();
+                getjson();
+            }
+            else{
+                response = {
+                    message: "Error",
+                    error: true
+                }
+            }
         }
-    }else if(data.habilidad2 && !data.habilidad1){
-        getjson();
-        var ok = searcher(data.alias);
-        if(players[ok.theindex].habilidad1 < 2 && players[ok.theindex].coins >= 5){
-            players[ok.theindex].habilidad2 + 1;
-            response = { 
-                player: players[ok.theindex].habilidad2,
-                error: false
-            };
-            savejson();
-            getjson();
-        }else{
+        else{
             response = {
                 message: "Error",
                 error: true
-            };
+            }
+        }
+    }else{
+        response = {
+            message: "Error",
+            error: true
         }
     }
     return response;
