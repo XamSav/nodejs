@@ -20,9 +20,9 @@ let codeErrorBuy402 = { code: 402, error: true, message: 'Error: Please specify 
 let codeErrorBuy403 = { code: 403, error: true, message: "Error: You don't have enough points"};
 
 var players = [
-    { position: "1", alias: "jperez", password:"a9993e364706816aba3e25717850c26c9cd0d89d", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 10, billetes: 0, habilidad1: 0, habilidad2: 1},
-    { position: "2", alias: "jsanz", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 1, habilidad2: 0 },
-    { position: "3", alias: "mgutierrez", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0 }
+    { position: "1", alias: "jperez", password:"a9993e364706816aba3e25717850c26c9cd0d89d", name: "Jose", surname: "Perez", score: 1000, created: "2020-11-03T15:20:21.377Z", coins: 10, billetes: 0, habilidad1: 0, habilidad2: 1, avatar: 0},
+    { position: "2", alias: "jsanz", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Juan", surname: "Sanz", score: 950, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 1, habilidad2: 0, avatar: 0 },
+    { position: "3", alias: "mgutierrez", password:"40bd001563085fc35165329ea1ff5c5ecbdbbeef", name: "Maria", surname: "Gutierrez", score: 850, created: "2020-11-03T15:20:21.377Z", coins: 0, billetes: 0, habilidad1: 0, habilidad2: 0, avatar: 0 }
 ];
 let response = {
     error: false,
@@ -138,6 +138,7 @@ router.post('/players/:alias', jsonParser   ,function (req, res) {
     var paramName = req.body.name || '';
     var paramSurname = req.body.surname || '';
     var paramPassword = req.body.password || '';
+    var paramAvatar = req.body.avatar || 0;
     var ok = comprobadorDeDatos(paramAlias, paramName, paramSurname, paramPassword);
     if (ok === false) {
         response = "ErrorFalta";
@@ -163,7 +164,8 @@ router.post('/players/:alias', jsonParser   ,function (req, res) {
                 coins: 10,
                 billetes: 5,
                 habilidad1: 0,
-                habilidad2: 0
+                habilidad2: 0,
+                avatar: paramAvatar
             });
             //Sort the ranking
             UpdateRanking();
@@ -191,7 +193,17 @@ router.put('/players/:alias',jsonParser, function (req, res) {
     }
     res.send(response);
 });
-
+router.put('/players/:alias/avatar', jsonParser, (req,res) => {
+    var paramAlias = req.params.alias ||'';
+    var ok = searcher(paramAlias);
+    if(ok.thebool){
+        var paramAvatar = req.body.avatar || players[ok.theindex].avatar;
+        players[ok.theindex].avatar = paramAvatar;
+        response = players[ok.theindex];
+    }else{
+        response = "ErrorAvatar";
+    }
+})
 //Delete
 //Borrar jugador by https://www.codegrepper.com/code-examples/c/delete+array+item+by+id+using+app.delete
 router.delete('/players/:alias', function(req,res){
@@ -297,7 +309,8 @@ function topJugadores(){
             alias: players[i].alias,
             score: players[i].score,
             coins: players[i].coins,
-            billetes: players[i].billetes
+            billetes: players[i].billetes,
+            avatar: players[i].avatar
         });
     }
     response = toplayers;
