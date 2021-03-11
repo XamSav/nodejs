@@ -26,7 +26,6 @@ const server = app.listen(port, () =>
 
 //WebSockets
 const SocketIo = require('socket.io');
-const { debug } = require('console');
 const io = SocketIo(server);
 
 io.on('connection', (socket) =>{
