@@ -12,6 +12,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //ApiJS para WebSocket
 var apijs = require('./api.js');
+//Funciones del archivo api.js
 var { searcher } = require('./api.js');
 var { newCoins } = require('./api.js');
 var { updatePower } = require('./api.js');
@@ -26,19 +27,10 @@ const server = app.listen(port, () =>
 
 //WebSockets
 const SocketIo = require('socket.io');
-const io = SocketIo(server);
+const io = SocketIo(server);    //(server) es la constante en la que guardamos el app.listen
 
 io.on('connection', (socket) =>{
   console.log('Nueva conexion de', socket.id);
-  /*socket.on('player:look',(data)=>{
-    var player = apijs.enviarJugador(parseInt(data));
-    if(player === false){
-      socket.emit('error', "The player does not exist");
-    }
-    else{
-      socket.emit('jugador', player);
-    }
-  });*/
     //Actualizar un jugador
   socket.on('player:playerupdate',(data)=>{
     var ok = apijs.searcher(data.alias);
